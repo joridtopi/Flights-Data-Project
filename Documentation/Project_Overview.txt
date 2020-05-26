@@ -1,0 +1,115 @@
+1. Flights Table
+
+Db Name:
+flights_table
+
+Description:
+This table contains an aggregation of all the yearly flight records. In a sense, this is the master table for all the domestic flight records from the year 1987 until 2019. Due to its large size, the scope of queries that can be performed on this table is limited. Therefore, this table is to be used only for simple queries, or for generating tables that can used for analysis, such those that require random sampling of the whole time range.
+
+Creation Method:
+This table was created by aggregating all the yearly flight tables into one master table. Since the flight tables for the years 2001 and 2002 do not contain a tail_num field, a special consideration is required for inserting these into the master table where the tail_num is forced to empty.
+
+A snippet of the query for inserting each yearly table into the flights table is contained in:
+total_flights_table.sql
+
+This table contains 192.5M records.
+
+2. Yearly Flight tables
+
+Db Name:
+flights_2019
+flights_2018
+flights_2017
+flights_2016
+flights_2015
+flights_2014
+flights_2013
+flights_2012
+flights_2011
+flights_2010
+flights_2009
+flights_2008
+flights_2007
+flights_2006
+flights_2005
+flights_2004
+flights_2003
+flights_2002
+flights_2001
+flights_2000
+flights_1999
+flights_1998
+flights_1997
+flights_1996
+flights_1995
+flights_1994
+flights_1993
+flights_1992
+flights_1991
+flights_1990
+flights_1989
+flights_1988
+flights_1987
+
+Description:
+
+These tables contain the domestic flight records for their respective year. This is essentially a yearly breakdown of the master flights table. The breakdown is necessary to soften the load on the queries and isolate potential issues to a particular year. These are the original tables that are created directly from importing the .csv files downloaded from the BTS webpage.
+
+Creation Method:
+
+Each table was created by importing the monthly records obtained as .csv files from the BTS webpage. So each table contains the import of 12 .csv files, one for each month. The tables contain the same columns apart for the years 2001 and 2002 which do not contain the tail number information.
+
+A snippet of the query importing the .csv file into each yearly flight table is contained in:
+import_flights_2019.sql
+
+3. Lookup Tables
+
+Airport Lookup
+
+Db Name:
+airport_lookup
+
+Description:
+
+Lookup table for the airport codes in the master flight records. The lookup contains airports from the whole world, providing an unstructured description of the airport location.
+
+Carrier Lookup
+
+Db Name:
+carrier_lookup
+
+Lookup table for the carrier codes in the master table. Provides the name of the carrier associated with each code.
+
+
+FAA Master Lookup
+
+Db Name:
+faa_master
+
+FAA Aircraft Serial Number
+
+Db Name:
+faa_ac_serial_num
+
+
+FAA Aircraft De-Registration
+
+Db Name:
+faa_dereg
+
+
+FAA FCFT REF
+
+Db Name:
+faa_fcftref
+
+
+4. Analysis Tables
+
+Db Name:
+airline_delays
+dest_delays
+origin_delays
+tail_num_dep_delays
+airline_aircraft
+airline_routes

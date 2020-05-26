@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>D3: A chart transition with controlled duration</title>
+		<script type="text/javascript" src="d3.js"></script>
+		<style type="text/css">
+			/* No style rules here yet */
+		</style>
+	</head>
+	<body>
+		<input type="text" id="userinput">
+		<button onclick="airline_dash()"> Submit </button>
+
+
+
+		<script type="text/javascript">
+
+			var testdata = [];
+
+			function airline_dash(){
+
+				d3.select("svg").remove();
+				d3.select("svg").remove();
+				d3.select("svg").remove();
+
+				var airline_name = document.getElementById("userinput").value;
+
+				//const url1 = 'http://localhost:5000/depdelays/year/airline/American Airlines Inc.';
+				//const url2 = 'http://localhost:5000/depdelays/year/airline/JetBlue Airways';
+				//const url3 = 'http://localhost:5000/depdelays/year/airline/Alaska Airlines Inc.';
+				//const url4 = 'http://localhost:5000/depdelays/year/airline/Southwest Airlines Co.';
+
+				const depdelays_url = 'http://localhost:5000/depdelays/year/airline/' + airline_name;
+				const yearlyroutes_url = 'http://localhost:5000/yearlyroutes/year/airline/' + airline_name;
+				const yearlyaircraft_url = 'http://localhost:5000/aircraft/year/airline/' + airline_name;
+
+
+
+				//Graphic for Average Departure delays for each year for selected airline
+		    d3.json(depdelays_url)
+				.then(function(dataset) {
+
+					dataset.forEach(function(d){
+					  d.avg_dep_dly = +d.avg_dep_dly;
+					});
+
+					//Width and height
+					var w = 600;
+					var h = 250;
+
+					var xScale = d3.scaleBand()
+									.domain(d3.range(dataset.length))
+									.rangeRound([0, w])
+									.paddingInner(0.05);
+
+					var yScale = d3.scaleLinear()
+									.domain([0, d3.max(dataset, function(d){return d.avg_dep_dly;})])
+									.range([0, h]);
+
+
+					//Create SVG element
+					var svg = d3.select("body")
+								.append("svg")
+								.attr("width", w)
+								.attr("height", h);
+
+					//Create bars
+					svg.selectAll("rect")
+						 .data(dataset)
+						 .enter()
+						 .append("rect")
+						 .attr("x", function(d, i) {
+								return xScale(i);
+						 })
+						 .attr("y", function(d) {
+								return h - yScale(d.avg_dep_dly);
+						 })
+						 .attr("width", xScale.bandwidth())
+						 .attr("height", function(d) {
+								return yScale(d.avg_dep_dly);
+						 })
+						 .attr("fill", function(d) {
+							return "rgb(0, 0, " + Math.round(d.avg_dep_dly * 10) + ")";
+						 });
+					});
+
+
+				//Graphic of number of unique routes for each year for selected airline
+				d3.json(yearlyroutes_url)
+				.then(function(dataset) {
+
+					dataset.forEach(function(d){
+						d.count = +d.count;
+					});
+
+					//Width and height
+					var w = 600;
+					var h = 250;
+
+					var xScale = d3.scaleBand()
+									.domain(d3.range(dataset.length))
+									.rangeRound([0, w])
+									.paddingInner(0.05);
+
+					var yScale = d3.scaleLinear()
+									.domain([0, d3.max(dataset, function(d){return d.count;})])
+									.range([0, h]);
+
+
+					//Create SVG element
+					var svg = d3.select("body")
+								.append("svg")
+								.attr("width", w)
+								.attr("height", h);
+
+					//Create bars
+					svg.selectAll("rect")
+						 .data(dataset)
+						 .enter()
+						 .append("rect")
+						 .attr("x", function(d, i) {
+								return xScale(i);
+						 })
+						 .attr("y", function(d) {
+								return h - yScale(d.count);
+						 })
+						 .attr("width", xScale.bandwidth())
+						 .attr("height", function(d) {
+								return yScale(d.count);
+						 })
+						 .attr("fill", function(d) {
+							return "rgb(0, 0, 150)";
+						 });
+					});
+
+
+
+					//Graphic of number of unique aircraft for each year for selected airline
+					d3.json(yearlyaircraft_url)
+					.then(function(dataset) {
+
+						testdata.push(dataset);
+						dataset.forEach(function(d){
+							d.count = +d.count;
+						});
+
+						//Width and height
+						var w = 600;
+						var h = 250;
+
+						var xScale = d3.scaleBand()
+										.domain(d3.range(dataset.length))
+										.rangeRound([0, w])
+										.paddingInner(0.05);
+
+						var yScale = d3.scaleLinear()
+										.domain([0, d3.max(dataset, function(d){return d.count;})])
+										.range([0, h]);
+
+
+						//Create SVG element
+						var svg = d3.select("body")
+									.append("svg")
+									.attr("width", w)
+									.attr("height", h);
+
+						//Create bars
+						svg.selectAll("rect")
+							 .data(dataset)
+							 .enter()
+							 .append("rect")
+							 .attr("x", function(d, i) {
+									return xScale(i);
+							 })
+							 .attr("y", function(d) {
+									return h - yScale(d.count);
+							 })
+							 .attr("width", xScale.bandwidth())
+							 .attr("height", function(d) {
+									return yScale(d.count);
+							 })
+							 .attr("fill", function(d) {
+								return "rgb(0, 0, 150)";
+							 });
+						});
+
+
+				}
+
+
+
+
+
+
+
+		</script>
+	</body>
+</html>

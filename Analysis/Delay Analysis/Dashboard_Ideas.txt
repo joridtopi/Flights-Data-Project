@@ -1,0 +1,22 @@
+
+Airline Delay Dashboard
+
+Description
+
+Take the average flight delay of each airline for each year, including all flights (even with no delays) in the average calculation. Departure delays that have NULL as a value have been replaced with 0 for this calculation. This is only for flights that are not cancelled. Only flights that are not cancelled are used for this calculation.
+
+Dashboard
+
+The average flight delay for each year can be displayed on a bar chart for any airline, or in general (all airlines).
+Explore options for combinations of airlines in one bar plot.
+
+- Airline Number of flights
+- Airline number of airplanes
+- Airline number of routes
+
+
+Airport Delay Dashboard
+
+The average departure flight delay for a selected airport of origin.
+The average arrival flight delay for a selected destination airport.
+A bubble map showing airports with biggest average delay for a certain year.

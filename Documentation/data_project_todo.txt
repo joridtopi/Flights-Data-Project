@@ -1,0 +1,16 @@
+To Do:
+
+1. Visualization
+
+- Find a way to backup postgres database
+
+Use back up files of database dumps. Generate a dump periodically.
+
+- Obtain table for airport lon and lat
+- Come up with more ideas for visuals
+- Organize the code for upload to github
+
+2. Analysis
+
+- Come up with analysis questions, based on past project
+- Create new folder structure and repo for upload to github
