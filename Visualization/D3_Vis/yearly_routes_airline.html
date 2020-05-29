@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Number of Routes Per Year</title>
+		<script type="text/javascript" src="d3.js"></script>
+		<style type="text/css">
+			/* No style rules here yet */
+		</style>
+	</head>
+	<body>
+		<select id="airlineList" onchange=get_chart()>
+			<option>Select Airline...</option>
+			<option>Alaska Airlines Inc.</option>
+			<option>American Airlines Inc.</option>
+			<option>Delta Air Lines Inc.</option>
+			<option>Frontier Airlines Inc.</option>
+			<option>Hawaiian Airlines Inc.</option>
+			<option>JetBlue Airways</option>
+			<option>Southwest Airlines Co.</option>
+			<option>Spirit Air Lines</option>
+			<option>United Air Lines Inc.</option>
+		</select>
+
+		<script type="text/javascript">
+
+			var testdata = [];
+
+			function get_chart(){
+
+				d3.select("svg").remove();
+
+				var airline_name = document.getElementById("airlineList").value;
+
+				const yearlyroutes_url = 'http://localhost:3000/yearlyroutes/year/airline/' + airline_name;
+
+				//Graphic of number of unique routes for each year for selected airline
+				d3.json(yearlyroutes_url)
+				.then(function(dataset) {
+
+					dataset.forEach(function(d){
+						d.count = +d.count;
+					});
+
+					testdata.push(dataset);
+
+					//Width and height
+					var w = 1100;
+					var h = 700;
+
+					//X-padding
+			    var x_pad = 60;
+			    //Y-padding
+			    var y_pad = 40;
+
+					var xScale = d3.scaleBand()
+									.domain(d3.range(dataset.length))
+									.rangeRound([0, w-x_pad])
+									.paddingInner(0.05);
+
+					var yScale = d3.scaleLinear()
+									.domain([0, d3.max(dataset, function(d){return d.count;})])
+									.range([0, h-y_pad]);
+
+					var xAxisScale = d3.scaleBand()
+			        .domain(dataset.map(function(d){return d.fl_year;}))
+			        .rangeRound([0, w-x_pad]);
+
+			    var yAxisScale = d3.scaleLinear()
+			            .domain([0, d3.max(dataset, function(d){return d.count;})])
+			            .range([h-y_pad,0]);
+
+			    var xAxis = d3.axisBottom(xAxisScale);
+
+			    var yAxis = d3.axisLeft(yAxisScale);
+
+					//Create SVG element
+					var svg = d3.select("body")
+								.append("svg")
+								.attr("width", w)
+								.attr("height", h);
+
+					//Create bars
+					svg.selectAll("rect")
+						 .data(dataset)
+						 .enter()
+						 .append("rect")
+						 .attr("x", function(d, i) {
+								return xScale(i) + x_pad;
+						 })
+						 .attr("y", function(d) {
+								return h - yScale(d.count) - y_pad;
+						 })
+						 .attr("width", xScale.bandwidth())
+						 .attr("height", function(d) {
+								return yScale(d.count);
+						 })
+						 .attr("fill", function(d) {
+							return "rgb(0, 0, 150)";
+						 });
+
+
+			 		//Create x-axis
+		      svg.append("g")
+		      .attr("class", "axis")
+		      .attr("transform","translate(" + x_pad + "," + (h-y_pad) + ")")
+		        .call(xAxis)
+		      .selectAll("text")
+		      .style("text-anchor", "end")
+		      .attr("dx", "-.8em")
+		      .attr("dy", ".15em")
+		      .attr("transform", "rotate(-65)");
+
+ 			   //Create y-axis
+ 			    svg.append("g")
+ 			    .attr("class", "axis")
+ 			    .attr("transform","translate(" + x_pad + ",0)")
+ 			    .call(yAxis);
+
+					});
+				}
+
+		</script>
+	</body>
+</html>
