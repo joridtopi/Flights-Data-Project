@@ -117,10 +117,10 @@
 			  }
 
 				//Obtain input data from database
-				const yearlyaircraft_url = 'http://localhost:3000/aircraft/year';
+				const yearlyroutes_url = 'http://localhost:3000/yearlyroutes/year';
 
 				//Parse through the input data to drive the D3 outputs
-				d3.json(yearlyaircraft_url)
+				d3.json(yearlyroutes_url)
 				.then(function(dataset) {
 
 					//Convert input data to appropriate data types

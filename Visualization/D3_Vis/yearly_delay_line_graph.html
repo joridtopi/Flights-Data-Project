@@ -117,15 +117,15 @@
 			  }
 
 				//Obtain input data from database
-				const yearlyaircraft_url = 'http://localhost:3000/aircraft/year';
+				const depdelays_url = 'http://localhost:3000/depdelays/year';
 
 				//Parse through the input data to drive the D3 outputs
-				d3.json(yearlyaircraft_url)
+				d3.json(depdelays_url)
 				.then(function(dataset) {
 
 					//Convert input data to appropriate data types
 					dataset.forEach(function(d){
-						d.count = +d.count;
+						d.avg_dep_dly = +d.avg_dep_dly;
 						d.fl_year = new Date(String(d.fl_year));
 					});
 
@@ -169,7 +169,7 @@
 								   .range([0, w - x_pad]);
 
 					yScale = d3.scaleLinear()
-									.domain([0, d3.max(dataset, function(d) { return d.count; })])
+									.domain([0, d3.max(dataset, function(d) { return d.avg_dep_dly; })])
 									.range([h - y_pad, 0]);
 
 					//Create axes based on X and Y scales
@@ -179,7 +179,7 @@
 					//Define line generator
 					line = d3.line()
 								.x(function(d) { return xScale(d.fl_year) + x_pad; })
-								.y(function(d) { return yScale(d.count); });
+								.y(function(d) { return yScale(d.avg_dep_dly); });
 
 					//Create the SVG element for the canvas
 					var svg = d3.select("body")
