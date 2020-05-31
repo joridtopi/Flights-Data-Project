@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Number of Aircraft Per Year</title>
+		<script type="text/javascript" src="d3.js"></script>
+		<style type="text/css">
+			/* No style rules here yet */
+		</style>
+	</head>
+	<body>
+		<select id="input1" onchange=get_chart()>
+			<option>Select Airline...</option>
+			<option>Alaska Airlines Inc.</option>
+			<option>American Airlines Inc.</option>
+			<option>Delta Air Lines Inc.</option>
+			<option>Frontier Airlines Inc.</option>
+			<option>Hawaiian Airlines Inc.</option>
+			<option>JetBlue Airways</option>
+			<option>Southwest Airlines Co.</option>
+			<option>Spirit Air Lines</option>
+			<option>United Air Lines Inc.</option>
+		</select>
+
+		<select id="input2" onchange=get_chart()>
+			<option>Select Airline...</option>
+			<option>Alaska Airlines Inc.</option>
+			<option>American Airlines Inc.</option>
+			<option>Delta Air Lines Inc.</option>
+			<option>Frontier Airlines Inc.</option>
+			<option>Hawaiian Airlines Inc.</option>
+			<option>JetBlue Airways</option>
+			<option>Southwest Airlines Co.</option>
+			<option>Spirit Air Lines</option>
+			<option>United Air Lines Inc.</option>
+		</select>
+
+		<select id="input3" onchange=get_chart()>
+			<option>Select Airline...</option>
+			<option>Alaska Airlines Inc.</option>
+			<option>American Airlines Inc.</option>
+			<option>Delta Air Lines Inc.</option>
+			<option>Frontier Airlines Inc.</option>
+			<option>Hawaiian Airlines Inc.</option>
+			<option>JetBlue Airways</option>
+			<option>Southwest Airlines Co.</option>
+			<option>Spirit Air Lines</option>
+			<option>United Air Lines Inc.</option>
+		</select>
+
+		<select id="input4" onchange=get_chart()>
+			<option>Select Airline...</option>
+			<option>Alaska Airlines Inc.</option>
+			<option>American Airlines Inc.</option>
+			<option>Delta Air Lines Inc.</option>
+			<option>Frontier Airlines Inc.</option>
+			<option>Hawaiian Airlines Inc.</option>
+			<option>JetBlue Airways</option>
+			<option>Southwest Airlines Co.</option>
+			<option>Spirit Air Lines</option>
+			<option>United Air Lines Inc.</option>
+		</select>
+
+		<select id="input5" onchange=get_chart()>
+			<option>Select Airline...</option>
+			<option>Alaska Airlines Inc.</option>
+			<option>American Airlines Inc.</option>
+			<option>Delta Air Lines Inc.</option>
+			<option>Frontier Airlines Inc.</option>
+			<option>Hawaiian Airlines Inc.</option>
+			<option>JetBlue Airways</option>
+			<option>Southwest Airlines Co.</option>
+			<option>Spirit Air Lines</option>
+			<option>United Air Lines Inc.</option>
+		</select>
+
+
+		<script type="text/javascript">
+
+			var testdata = [];
+
+			function get_chart(){
+
+				d3.select("svg").remove();
+
+				//Obtain user inputs
+				var input1 = document.getElementById("input1").value;
+				var input2 = document.getElementById("input2").value;
+				var input3 = document.getElementById("input3").value;
+				var input4 = document.getElementById("input4").value;
+				var input5 = document.getElementById("input5").value;
+
+				//Obtain input data from database
+				const yearlyaircraft_url = 'http://localhost:3000/aircraft/year';
+
+				//Call function upon a user input selection event
+				d3.json(yearlyaircraft_url)
+				.then(function(dataset) {
+
+					//Convert input data to appropriate data types
+					dataset.forEach(function(d){
+						d.count = +d.count;
+						d.fl_year = new Date(String(d.fl_year));
+					});
+
+					//Create filtered datasets based on user inputs
+					dataset = dataset.filter(el=>el.carrier_name==input1
+																		|el.carrier_name==input2
+																		|el.carrier_name==input3
+																	  |el.carrier_name==input4
+																		|el.carrier_name==input5);
+					var dataset1 = dataset.filter(el=>el.carrier_name==input1);
+					var dataset2 = dataset.filter(el=>el.carrier_name==input2);
+					var dataset3 = dataset.filter(el=>el.carrier_name==input3);
+					var dataset4 = dataset.filter(el=>el.carrier_name==input4);
+					var dataset5 = dataset.filter(el=>el.carrier_name==input5);
+
+					//testdata.push(dataset);
+
+					//Width and height of SVG canvas
+					var w = 1000;
+					var h = 600;
+
+					//X-padding
+			    var x_pad = 60;
+			    //Y-padding
+			    var y_pad = 40;
+
+					//Create scale functions based on filtered data
+					xScale = d3.scaleTime()
+								   .domain([
+										d3.min(dataset, function(d) { return d.fl_year; }),
+										d3.max(dataset, function(d) { return d.fl_year; })
+									])
+								   .range([0, w - x_pad]);
+
+					yScale = d3.scaleLinear()
+									.domain([0, d3.max(dataset, function(d) { return d.count; })])
+									.range([h - y_pad, 0]);
+
+					//Create axes based on X and Y scales
+					var xAxis = d3.axisBottom(xScale);
+					var yAxis = d3.axisLeft(yScale);
+
+					//Define line generator
+					line = d3.line()
+								.x(function(d) { return xScale(d.fl_year) + x_pad; })
+								.y(function(d) { return yScale(d.count); });
+
+					//Create the SVG element for the canvas
+					var svg = d3.select("body")
+								.append("svg")
+								.attr("width", w)
+								.attr("height", h);
+
+					//Create a line of filtered data based on each user input
+					svg.append("path")
+						.datum(dataset1)
+						.attr("class", "line")
+						.attr("stroke", "blue")
+						.attr("stroke-width", "2px")
+						.attr("fill", "none")
+						.attr("d", line);
+
+					svg.append("path")
+						.datum(dataset2)
+						.attr("class", "line")
+						.attr("stroke", "red")
+						.attr("stroke-width", "2px")
+						.attr("fill", "none")
+						.attr("d", line);
+
+					svg.append("path")
+						.datum(dataset3)
+						.attr("class", "line")
+						.attr("stroke", "green")
+						.attr("stroke-width", "2px")
+						.attr("fill", "none")
+						.attr("d", line);
+
+					svg.append("path")
+						.datum(dataset4)
+						.attr("class", "line")
+						.attr("stroke", "pink")
+						.attr("stroke-width", "2px")
+						.attr("fill", "none")
+						.attr("d", line);
+
+					svg.append("path")
+						.datum(dataset5)
+						.attr("class", "line")
+						.attr("stroke", "violet")
+						.attr("stroke-width", "2px")
+						.attr("fill", "none")
+						.attr("d", line);
+
+					//Add the x-axis
+					svg.append("g")
+					.attr("class", "axis")
+					.attr("transform","translate(" + x_pad + "," + (h-y_pad) + ")")
+						.call(xAxis)
+					.selectAll("text")
+					.style("text-anchor", "end")
+					.attr("dx", "-.8em")
+					.attr("dy", ".15em")
+					.attr("transform", "rotate(-65)");
+
+				 //Add the y-axis
+					svg.append("g")
+					.attr("class", "axis")
+					.attr("transform","translate(" + x_pad + ",0)")
+					.call(yAxis);
+
+			})
+		}
+
+		</script>
+	</body>
+</html>
