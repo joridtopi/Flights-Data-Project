@@ -32,7 +32,7 @@
 
 				var airline_name = document.getElementById("airlineList").value;
 
-				const yearlyroutes_url = 'http://localhost:3000/yearlyroutes/year/airline/' + airline_name;
+				const yearlyroutes_url = 'http://localhost:3000/yearlyroutes/year';
 
 				//Graphic of number of unique routes for each year for selected airline
 				d3.json(yearlyroutes_url)
@@ -41,6 +41,9 @@
 					dataset.forEach(function(d){
 						d.count = +d.count;
 					});
+
+					//Create filtered datasets based on user input
+					dataset = dataset.filter(d=>d.carrier_name==airline_name)
 
 					testdata.push(dataset);
 

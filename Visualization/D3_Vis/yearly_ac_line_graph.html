@@ -104,16 +104,16 @@
 					});
 
 					//Create filtered datasets based on user inputs
-					dataset = dataset.filter(el=>el.carrier_name==input1
-																		|el.carrier_name==input2
-																		|el.carrier_name==input3
-																	  |el.carrier_name==input4
-																		|el.carrier_name==input5);
-					var dataset1 = dataset.filter(el=>el.carrier_name==input1);
-					var dataset2 = dataset.filter(el=>el.carrier_name==input2);
-					var dataset3 = dataset.filter(el=>el.carrier_name==input3);
-					var dataset4 = dataset.filter(el=>el.carrier_name==input4);
-					var dataset5 = dataset.filter(el=>el.carrier_name==input5);
+					dataset = dataset.filter(d=>d.carrier_name==input1
+																		|d.carrier_name==input2
+																		|d.carrier_name==input3
+																	  |d.carrier_name==input4
+																		|d.carrier_name==input5);
+					var dataset1 = dataset.filter(d=>d.carrier_name==input1);
+					var dataset2 = dataset.filter(d=>d.carrier_name==input2);
+					var dataset3 = dataset.filter(d=>d.carrier_name==input3);
+					var dataset4 = dataset.filter(d=>d.carrier_name==input4);
+					var dataset5 = dataset.filter(d=>d.carrier_name==input5);
 
 					//testdata.push(dataset);
 

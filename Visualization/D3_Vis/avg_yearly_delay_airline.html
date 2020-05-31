@@ -32,7 +32,7 @@
 
 				var airline_name = document.getElementById("airlineList").value;
 
-				const depdelays_url = 'http://localhost:3000/depdelays/year/airline/' + airline_name;
+				const depdelays_url = 'http://localhost:3000/depdelays/year';
 
 				//Graphic for Average Departure delays for each year for selected airline
 			  d3.json(depdelays_url)
@@ -41,6 +41,9 @@
 			    dataset.forEach(function(d){
 			      d.avg_dep_dly = +d.avg_dep_dly;
 			    });
+
+					//Create filtered datasets based on user input
+					dataset = dataset.filter(d=>d.carrier_name==airline_name)
 
 			    testdata.push(dataset);
 

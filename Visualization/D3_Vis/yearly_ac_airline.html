@@ -29,19 +29,24 @@
 			function get_chart(){
 
 				d3.select("svg").remove();
-				
+
 				var airline_name = document.getElementById("airlineList").value;
 
-				const yearlyaircraft_url = 'http://localhost:3000/aircraft/year/airline/' + airline_name;
+				const yearlyaircraft_url = 'http://localhost:3000/aircraft/year';
 
 				//Graphic of number of unique aircraft for each year for selected airline
 				d3.json(yearlyaircraft_url)
 				.then(function(dataset) {
 
-					testdata.push(dataset);
+
 					dataset.forEach(function(d){
 						d.count = +d.count;
 					});
+
+					//Create filtered datasets based on user input
+					dataset = dataset.filter(d=>d.carrier_name==airline_name)
+
+					testdata.push(dataset);
 
 					//Width and height
 					var w = 1000;
