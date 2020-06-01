@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Number of Aircraft Per Year</title>
+		<script type="text/javascript" src="d3.js"></script>
+		<style type="text/css">
+			p {
+				font-family: Helvetica, sans-serif;
+				font-size: 12px;
+			}
+
+			input[type=checkbox] {
+				margin-left: 5px;
+			}
+		</style>
+	</head>
+	<body>
+
+		<p>
+		<input type="checkbox" id="input1" name="airline1" value="Alaska Airlines Inc.">
+		<label for="airline1"> Alaska Airlines</label>
+		<input type="checkbox" id="input2" name="airline2" value="American Airlines Inc.">
+		<label for="airline2"> American Airlines</label>
+		<input type="checkbox" id="input3" name="airline3" value="Delta Air Lines Inc.">
+		<label for="airline3"> Delta Air Lines</label>
+		<input type="checkbox" id="input4" name="airline4" value="Frontier Airlines Inc.">
+		<label for="airline4"> Frontier Airlines</label>
+		<input type="checkbox" id="input5" name="airline5" value="Hawaiian Airlines Inc.">
+		<label for="airline5"> Hawaiian Airlines</label>
+		<input type="checkbox" id="input6" name="airline6" value="JetBlue Airways">
+		<label for="airline6"> JetBlue Airways</label>
+		<input type="checkbox" id="input7" name="airline7" value="Southwest Airlines Co.">
+		<label for="airline7"> Southwest Airlines</label>
+		<input type="checkbox" id="input8" name="airline8" value="Spirit Air Lines">
+		<label for="airline8"> Spirit Airlines</label>
+		<input type="checkbox" id="input9" name="airline9" value="United Air Lines Inc.">
+		<label for="airline9"> United Airlines</label>
+		</p>
+
+
+
+		<script type="text/javascript">
+
+			var testdata = [];
+
+			d3.selectAll("input")
+				.on("click", function() {
+
+					//Remove previous graph for a refresh property
+					d3.select("svg").remove();
+
+					//Obtain user inputs
+					var cb1 = document.getElementById("input1");
+					var cb2 = document.getElementById("input2");
+					var cb3 = document.getElementById("input3");
+					var cb4 = document.getElementById("input4");
+					var cb5 = document.getElementById("input5");
+					var cb6 = document.getElementById("input6");
+					var cb7 = document.getElementById("input7");
+					var cb8 = document.getElementById("input8");
+					var cb9 = document.getElementById("input9");
+
+					//Assign value if checkbox is checked otherwise empty
+					if (cb1.checked == true){
+				    var input1 = document.getElementById("input1").value;
+				  } else {
+				    var input1 = " ";
+				  }
+
+					if (cb2.checked == true){
+				    var input2 = document.getElementById("input2").value;
+				  } else {
+				    var input2 = " ";
+				  }
+
+					if (cb3.checked == true){
+				    var input3 = document.getElementById("input3").value;
+				  } else {
+				    var input3 = " ";
+				  }
+
+					if (cb4.checked == true){
+				    var input4 = document.getElementById("input4").value;
+				  } else {
+				    var input4 = " ";
+				  }
+
+					if (cb5.checked == true){
+				    var input5 = document.getElementById("input5").value;
+				  } else {
+				    var input5 = " ";
+				  }
+
+					if (cb6.checked == true){
+				    var input6 = document.getElementById("input6").value;
+				  } else {
+				    var input6 = " ";
+				  }
+
+					if (cb7.checked == true){
+				    var input7 = document.getElementById("input7").value;
+				  } else {
+				    var input7 = " ";
+				  }
+
+					if (cb8.checked == true){
+				    var input8 = document.getElementById("input8").value;
+				  } else {
+				    var input8 = " ";
+				  }
+
+					if (cb9.checked == true){
+				    var input9 = document.getElementById("input9").value;
+				  } else {
+				    var input9 = " ";
+				  }
+
+					//Obtain input data from database
+					const depdelays_url = 'http://localhost:3000/depdelays/daily';
+
+					//Parse through the input data to drive the D3 outputs
+					d3.json(depdelays_url)
+					.then(function(dataset) {
+
+						//Convert input data to appropriate data types
+						dataset.forEach(function(d){
+							d.avg_dep_dly = +d.avg_dep_dly;
+							d.fl_date = new Date(String(d.fl_date));
+						});
+
+						//Create filtered datasets based on user inputs
+						dataset = dataset.filter(d=>d.carrier_name==input1
+																			|d.carrier_name==input2
+																			|d.carrier_name==input3
+																		  |d.carrier_name==input4
+																			|d.carrier_name==input5
+																		  |d.carrier_name==input6
+																		  |d.carrier_name==input7
+																		  |d.carrier_name==input8
+																		  |d.carrier_name==input9);
+
+						dataset = dataset.filter(d=>d.fl_year==2019);
+						var dataset1 = dataset.filter(d=>d.carrier_name==input1);
+						var dataset2 = dataset.filter(d=>d.carrier_name==input2);
+						var dataset3 = dataset.filter(d=>d.carrier_name==input3);
+						var dataset4 = dataset.filter(d=>d.carrier_name==input4);
+						var dataset5 = dataset.filter(d=>d.carrier_name==input5);
+						var dataset6 = dataset.filter(d=>d.carrier_name==input6);
+						var dataset7 = dataset.filter(d=>d.carrier_name==input7);
+						var dataset8 = dataset.filter(d=>d.carrier_name==input8);
+						var dataset9 = dataset.filter(d=>d.carrier_name==input9);
+
+						testdata.push(dataset);
+
+						//Width and height of SVG canvas
+						var w = 1000;
+						var h = 600;
+
+						//X-padding
+				    var x_pad = 60;
+				    //Y-padding
+				    var y_pad = 40;
+
+						//Create scale functions based on filtered data
+						xScale = d3.scaleTime()
+									   .domain([
+											d3.min(dataset, function(d) { return d.fl_date; }),
+											d3.max(dataset, function(d) { return d.fl_date; })
+										])
+									   .range([0, w - x_pad]);
+
+						yScale = d3.scaleLinear()
+										.domain([0, d3.max(dataset, function(d) { return d.avg_dep_dly; })])
+										.range([h - y_pad, 0]);
+
+						//Create axes based on X and Y scales
+						var xAxis = d3.axisBottom(xScale);
+						var yAxis = d3.axisLeft(yScale);
+
+						//Define line generator
+						line = d3.line()
+									.x(function(d) { return xScale(d.fl_date) + x_pad; })
+									.y(function(d) { return yScale(d.avg_dep_dly); });
+
+						//Create the SVG element for the canvas
+						var svg = d3.select("body")
+									.append("svg")
+									.attr("width", w)
+									.attr("height", h);
+
+						//Create a line of filtered data based on each user input
+						svg.append("path")
+							.datum(dataset1)
+							.attr("class", "line")
+							.attr("stroke", "blue")
+							.attr("stroke-width", "2px")
+							.attr("fill", "none")
+							.attr("d", line);
+
+						svg.append("path")
+							.datum(dataset2)
+							.attr("class", "line")
+							.attr("stroke", "red")
+							.attr("stroke-width", "2px")
+							.attr("fill", "none")
+							.attr("d", line);
+
+						svg.append("path")
+							.datum(dataset3)
+							.attr("class", "line")
+							.attr("stroke", "green")
+							.attr("stroke-width", "2px")
+							.attr("fill", "none")
+							.attr("d", line);
+
+						svg.append("path")
+							.datum(dataset4)
+							.attr("class", "line")
+							.attr("stroke", "pink")
+							.attr("stroke-width", "2px")
+							.attr("fill", "none")
+							.attr("d", line);
+
+						svg.append("path")
+							.datum(dataset5)
+							.attr("class", "line")
+							.attr("stroke", "violet")
+							.attr("stroke-width", "2px")
+							.attr("fill", "none")
+							.attr("d", line);
+
+						svg.append("path")
+							.datum(dataset6)
+							.attr("class", "line")
+							.attr("stroke", "grey")
+							.attr("stroke-width", "2px")
+							.attr("fill", "none")
+							.attr("d", line);
+
+						svg.append("path")
+							.datum(dataset7)
+							.attr("class", "line")
+							.attr("stroke", "yellow")
+							.attr("stroke-width", "2px")
+							.attr("fill", "none")
+							.attr("d", line);
+
+						svg.append("path")
+							.datum(dataset8)
+							.attr("class", "line")
+							.attr("stroke", "orange")
+							.attr("stroke-width", "2px")
+							.attr("fill", "none")
+							.attr("d", line);
+
+						svg.append("path")
+							.datum(dataset9)
+							.attr("class", "line")
+							.attr("stroke", "black")
+							.attr("stroke-width", "2px")
+							.attr("fill", "none")
+							.attr("d", line);
+
+						//Add the x-axis
+						svg.append("g")
+						.attr("class", "axis")
+						.attr("transform","translate(" + x_pad + "," + (h-y_pad) + ")")
+							.call(xAxis)
+						.selectAll("text")
+						.style("text-anchor", "end")
+						.attr("dx", "-.8em")
+						.attr("dy", ".15em")
+						.attr("transform", "rotate(-65)");
+
+					 //Add the y-axis
+						svg.append("g")
+						.attr("class", "axis")
+						.attr("transform","translate(" + x_pad + ",0)")
+						.call(yAxis);
+
+			})
+		})
+
+
+		</script>
+	</body>
+</html>

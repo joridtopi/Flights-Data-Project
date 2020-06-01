@@ -18,23 +18,23 @@
 	<body>
 
 		<p>
-		<input type="checkbox" id="input1" name="airline1" value="Alaska Airlines Inc." onchange=get_chart()>
+		<input type="checkbox" id="input1" name="airline1" value="Alaska Airlines Inc.">
 		<label for="airline1"> Alaska Airlines</label>
-		<input type="checkbox" id="input2" name="airline2" value="American Airlines Inc." onchange=get_chart()>
+		<input type="checkbox" id="input2" name="airline2" value="American Airlines Inc.">
 		<label for="airline2"> American Airlines</label>
-		<input type="checkbox" id="input3" name="airline3" value="Delta Air Lines Inc." onchange=get_chart()>
+		<input type="checkbox" id="input3" name="airline3" value="Delta Air Lines Inc.">
 		<label for="airline3"> Delta Air Lines</label>
-		<input type="checkbox" id="input4" name="airline4" value="Frontier Airlines Inc." onchange=get_chart()>
+		<input type="checkbox" id="input4" name="airline4" value="Frontier Airlines Inc.">
 		<label for="airline4"> Frontier Airlines</label>
-		<input type="checkbox" id="input5" name="airline5" value="Hawaiian Airlines Inc." onchange=get_chart()>
+		<input type="checkbox" id="input5" name="airline5" value="Hawaiian Airlines Inc.">
 		<label for="airline5"> Hawaiian Airlines</label>
-		<input type="checkbox" id="input6" name="airline6" value="JetBlue Airways" onchange=get_chart()>
+		<input type="checkbox" id="input6" name="airline6" value="JetBlue Airways">
 		<label for="airline6"> JetBlue Airways</label>
-		<input type="checkbox" id="input7" name="airline7" value="Southwest Airlines Co." onchange=get_chart()>
+		<input type="checkbox" id="input7" name="airline7" value="Southwest Airlines Co.">
 		<label for="airline7"> Southwest Airlines</label>
-		<input type="checkbox" id="input8" name="airline8" value="Spirit Air Lines" onchange=get_chart()>
+		<input type="checkbox" id="input8" name="airline8" value="Spirit Air Lines">
 		<label for="airline8"> Spirit Airlines</label>
-		<input type="checkbox" id="input9" name="airline9" value="United Air Lines Inc." onchange=get_chart()>
+		<input type="checkbox" id="input9" name="airline9" value="United Air Lines Inc.">
 		<label for="airline9"> United Airlines</label>
 		</p>
 
@@ -45,7 +45,8 @@
 			var testdata = [];
 
 			//Graph function executed on every checkbox selection
-			function get_chart(){
+			d3.selectAll("input")
+				.on("click", function() {
 
 				//Remove previous graph for a refresh property
 				d3.select("svg").remove();
@@ -278,7 +279,7 @@
 					.call(yAxis);
 
 			})
-		}
+		})
 
 		</script>
 	</body>

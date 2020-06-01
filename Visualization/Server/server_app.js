@@ -8,6 +8,7 @@ app.use(express.json());
 const db = require('./queries')
 
 app.get('/depdelays/year', db.getFlightDelays);
+app.get('/depdelays/daily', db.getFlightDelaysDaily);
 app.get('/yearlyroutes/year', db.getFlightRoutes);
 app.get('/aircraft/year/', db.getAircraftCount);
 

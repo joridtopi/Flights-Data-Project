@@ -23,6 +23,27 @@ const getFlightDelays = (request, response) => {
   });
 }
 
+
+const getFlightDelaysDaily = (request, response) => {
+  const query = `
+  SELECT avg_dep_dly,
+         avg_arr_dly,
+         fl_date,
+         carrier_name,
+         EXTRACT(YEAR from fl_date) AS fl_year
+  FROM airline_delays_daily
+  LEFT JOIN carrier_lookup ON op_unique_carrier = code
+  ORDER BY fl_date ASC;
+  `;
+  pool.query(query, (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  });
+}
+
+
 const getFlightRoutes = (request, response) => {
   const query = `
   SELECT fl_year, count, carrier_name
@@ -55,6 +76,7 @@ const getAircraftCount = (request, response) => {
 
 module.exports = {
   getFlightDelays,
+  getFlightDelaysDaily,
   getFlightRoutes,
   getAircraftCount
 }
