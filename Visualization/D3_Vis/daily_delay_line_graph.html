@@ -7,7 +7,8 @@
 		<style type="text/css">
 			p {
 				font-family: Helvetica, sans-serif;
-				font-size: 12px;
+				font-size: 14px;
+				font-weight: bold;
 			}
 
 			input[type=checkbox] {
@@ -18,24 +19,24 @@
 	<body>
 
 		<p>
-		<input type="checkbox" id="input1" name="airline1" value="Alaska Airlines Inc." onchange=getChart()>
-		<label for="airline1" background="blue"> Alaska Airlines</label>
-		<input type="checkbox" id="input2" name="airline2" value="American Airlines Inc." onchange=getChart()>
-		<label for="airline2"> American Airlines</label>
-		<input type="checkbox" id="input3" name="airline3" value="Delta Air Lines Inc." onchange=getChart()>
-		<label for="airline3"> Delta Air Lines</label>
-		<input type="checkbox" id="input4" name="airline4" value="Frontier Airlines Inc." onchange=getChart()>
-		<label for="airline4"> Frontier Airlines</label>
-		<input type="checkbox" id="input5" name="airline5" value="Hawaiian Airlines Inc." onchange=getChart()>
-		<label for="airline5"> Hawaiian Airlines</label>
-		<input type="checkbox" id="input6" name="airline6" value="JetBlue Airways" onchange=getChart()>
-		<label for="airline6"> JetBlue Airways</label>
-		<input type="checkbox" id="input7" name="airline7" value="Southwest Airlines Co." onchange=getChart()>
-		<label for="airline7"> Southwest Airlines</label>
-		<input type="checkbox" id="input8" name="airline8" value="Spirit Air Lines" onchange=getChart()>
-		<label for="airline8"> Spirit Airlines</label>
-		<input type="checkbox" id="input9" name="airline9" value="United Air Lines Inc." onchange=getChart()>
-		<label for="airline9"> United Airlines</label>
+		<input type="checkbox" id="input1" name="airline1" value="Alaska Airlines Inc.">
+		<label for="airline1" style="color:seagreen"> Alaska Airlines</label>
+		<input type="checkbox" id="input2" name="airline2" value="American Airlines Inc.">
+		<label for="airline2" style="color:slategray"> American Airlines</label>
+		<input type="checkbox" id="input3" name="airline3" value="Delta Air Lines Inc.">
+		<label for="airline3" style="color:darkred"> Delta Air Lines</label>
+		<input type="checkbox" id="input4" name="airline4" value="Frontier Airlines Inc.">
+		<label for="airline4" style="color:yellowgreen"> Frontier Airlines</label>
+		<input type="checkbox" id="input5" name="airline5" value="Hawaiian Airlines Inc.">
+		<label for="airline5" style="color:orchid"> Hawaiian Airlines</label>
+		<input type="checkbox" id="input6" name="airline6" value="JetBlue Airways">
+		<label for="airline6" style="color:skyblue"> JetBlue Airways</label>
+		<input type="checkbox" id="input7" name="airline7" value="Southwest Airlines Co.">
+		<label for="airline7" style="color:indigo"> Southwest Airlines</label>
+		<input type="checkbox" id="input8" name="airline8" value="Spirit Air Lines">
+		<label for="airline8" style="color:gold"> Spirit Airlines</label>
+		<input type="checkbox" id="input9" name="airline9" value="United Air Lines Inc.">
+		<label for="airline9" style="color:cornflowerblue"> United Airlines</label>
 		</p>
 
 
@@ -43,308 +44,341 @@
 		<script type="text/javascript">
 
 			var testdata = [];
-			var xScaleDomain = [];
+			var inputsel = [];
 
 			//Graph function executed on every checkbox selection
-			function getChart(){
 
-				//Remove previous graph for a refresh property
-				d3.select("svg").remove();
+			//Obtain user inputs
+			var cb1 = document.getElementById("input1");
+			var cb2 = document.getElementById("input2");
+			var cb3 = document.getElementById("input3");
+			var cb4 = document.getElementById("input4");
+			var cb5 = document.getElementById("input5");
+			var cb6 = document.getElementById("input6");
+			var cb7 = document.getElementById("input7");
+			var cb8 = document.getElementById("input8");
+			var cb9 = document.getElementById("input9");
 
-				//Obtain user inputs
-				var cb1 = document.getElementById("input1");
-				var cb2 = document.getElementById("input2");
-				var cb3 = document.getElementById("input3");
-				var cb4 = document.getElementById("input4");
-				var cb5 = document.getElementById("input5");
-				var cb6 = document.getElementById("input6");
-				var cb7 = document.getElementById("input7");
-				var cb8 = document.getElementById("input8");
-				var cb9 = document.getElementById("input9");
+			//Obtain input data from database
+			const depdelays_url = 'http://localhost:3000/depdelays/daily';
+
+			//Global variable of the dataset
+			var datasetGlobal = [];
+
+			//Width and height of SVG canvas
+			var w = 1200;
+			var h = 600;
+
+			//X and Y padding
+			var x_pad = 60;
+			var y_pad = 40;
+
+			//Declare variables globally for scales
+			var xScale = [];
+			var yScale = [];
+
+			//Declare variables globally for zoom transformed scales
+			var xScaleNew = [];
+			var yScaleNew = [];
+
+			//Declare variables globally for adding axes
+			var xAxisAdd = [];
+			var yAxisAdd = [];
+
+			//Declare variables globally for adding lines
+			var line1Add = [];
+			var line2Add = [];
+			var line3Add = [];
+			var line4Add = [];
+			var line5Add = [];
+			var line6Add = [];
+			var line7Add = [];
+			var line8Add = [];
+			var line9Add = [];
+
+
+			//Create zoom behavior
+			var zoom = d3.zoom()
+				.on("zoom", updateChart);
+
+			//Create the SVG element for the canvas
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h)
+						.call(zoom);
+
+			//Create clip for clipping zoom transformed lines
+			var clip = svg.append("clipPath")
+					.attr("id", "clip")
+				.append("rect")
+					.attr("x", x_pad)
+					.attr("y", 0)
+					.attr("width", w)
+					.attr("height", h-y_pad);
+
+			//Create event to listen for user input clicks to update data
+			d3.selectAll('input')
+				.on("click", getData);
+
+			//Update the input data
+			function getData(){
+				d3.json(depdelays_url)
+			.then(function(dataset) {
+
+				//Convert input data to appropriate data types
+				dataset.forEach(function(d){
+					d.avg_dep_dly = +d.avg_dep_dly;
+					d.fl_date = new Date(String(d.fl_date));
+				});
 
 				//Assign value if checkbox is checked otherwise empty
 				if (cb1.checked == true){
-			    var input1 = document.getElementById("input1").value;
-			  } else {
-			    var input1 = " ";
-			  }
+					var input1 = document.getElementById("input1").value;
+				} else {
+					var input1 = " ";
+				}
 
 				if (cb2.checked == true){
-			    var input2 = document.getElementById("input2").value;
-			  } else {
-			    var input2 = " ";
-			  }
+					var input2 = document.getElementById("input2").value;
+				} else {
+					var input2 = " ";
+				}
 
 				if (cb3.checked == true){
-			    var input3 = document.getElementById("input3").value;
-			  } else {
-			    var input3 = " ";
-			  }
+					var input3 = document.getElementById("input3").value;
+				} else {
+					var input3 = " ";
+				}
 
 				if (cb4.checked == true){
-			    var input4 = document.getElementById("input4").value;
-			  } else {
-			    var input4 = " ";
-			  }
+					var input4 = document.getElementById("input4").value;
+				} else {
+					var input4 = " ";
+				}
 
 				if (cb5.checked == true){
-			    var input5 = document.getElementById("input5").value;
-			  } else {
-			    var input5 = " ";
-			  }
+					var input5 = document.getElementById("input5").value;
+				} else {
+					var input5 = " ";
+				}
 
 				if (cb6.checked == true){
-			    var input6 = document.getElementById("input6").value;
-			  } else {
-			    var input6 = " ";
-			  }
+					var input6 = document.getElementById("input6").value;
+				} else {
+					var input6 = " ";
+				}
 
 				if (cb7.checked == true){
-			    var input7 = document.getElementById("input7").value;
-			  } else {
-			    var input7 = " ";
-			  }
+					var input7 = document.getElementById("input7").value;
+				} else {
+					var input7 = " ";
+				}
 
 				if (cb8.checked == true){
-			    var input8 = document.getElementById("input8").value;
-			  } else {
-			    var input8 = " ";
-			  }
+					var input8 = document.getElementById("input8").value;
+				} else {
+					var input8 = " ";
+				}
 
 				if (cb9.checked == true){
-			    var input9 = document.getElementById("input9").value;
-			  } else {
-			    var input9 = " ";
-			  }
+					var input9 = document.getElementById("input9").value;
+				} else {
+					var input9 = " ";
+				}
 
-				//Obtain input data from database
-				const depdelays_url = 'http://localhost:3000/depdelays/daily';
+				//Create dataset filtered on selected inputs
+				datasetGlobal = dataset.filter(d=>d.carrier_name==input1
+																	|d.carrier_name==input2
+																	|d.carrier_name==input3
+																	|d.carrier_name==input4
+																	|d.carrier_name==input5
+																	|d.carrier_name==input6
+																	|d.carrier_name==input7
+																	|d.carrier_name==input8
+																	|d.carrier_name==input9);
 
-				//Parse through the input data to drive the D3 outputs
-				d3.json(depdelays_url)
-				.then(function(dataset) {
+				//Create dataset for each path line
+				dataset1 = dataset.filter(d=>d.carrier_name==input1);
+				dataset2 = dataset.filter(d=>d.carrier_name==input2);
+				dataset3 = dataset.filter(d=>d.carrier_name==input3);
+				dataset4 = dataset.filter(d=>d.carrier_name==input4);
+				dataset5 = dataset.filter(d=>d.carrier_name==input5);
+				dataset6 = dataset.filter(d=>d.carrier_name==input6);
+				dataset7 = dataset.filter(d=>d.carrier_name==input7);
+				dataset8 = dataset.filter(d=>d.carrier_name==input8);
+				dataset9 = dataset.filter(d=>d.carrier_name==input9);
 
-					//Convert input data to appropriate data types
-					dataset.forEach(function(d){
-						d.avg_dep_dly = +d.avg_dep_dly;
-						d.fl_date = new Date(String(d.fl_date));
-					});
+				//Create scale functions based on filtered data
+				xScale = d3.scaleTime()
+						   .domain([
+								d3.min(datasetGlobal, function(d) { return d.fl_date; }),
+								d3.max(datasetGlobal, function(d) { return d.fl_date; })
+							])
+						   .range([0, w - x_pad]);
 
-					//Create filtered datasets based on user inputs
-					dataset = dataset.filter(d=>d.carrier_name==input1
-																		|d.carrier_name==input2
-																		|d.carrier_name==input3
-																	  |d.carrier_name==input4
-																		|d.carrier_name==input5
-																	  |d.carrier_name==input6
-																	  |d.carrier_name==input7
-																	  |d.carrier_name==input8
-																	  |d.carrier_name==input9);
+				yScale = d3.scaleLinear()
+							.domain([d3.min(datasetGlobal, function(d) { return d.avg_dep_dly; }),
+											 d3.max(datasetGlobal, function(d) { return d.avg_dep_dly; })])
+							.range([h - y_pad, 0]);
 
-					var dataset1 = dataset.filter(d=>d.carrier_name==input1);
-					var dataset2 = dataset.filter(d=>d.carrier_name==input2);
-					var dataset3 = dataset.filter(d=>d.carrier_name==input3);
-					var dataset4 = dataset.filter(d=>d.carrier_name==input4);
-					var dataset5 = dataset.filter(d=>d.carrier_name==input5);
-					var dataset6 = dataset.filter(d=>d.carrier_name==input6);
-					var dataset7 = dataset.filter(d=>d.carrier_name==input7);
-					var dataset8 = dataset.filter(d=>d.carrier_name==input8);
-					var dataset9 = dataset.filter(d=>d.carrier_name==input9);
+				//Create axes based on X and Y scales
+				xAxis = d3.axisBottom(xScale);
+				yAxis = d3.axisLeft(yScale);
 
-					testdata.push(dataset);
+				//Define line generator
+				line = d3.line()
+							.x(function(d) { return xScale(d.fl_date) + x_pad; })
+							.y(function(d) { return yScale(d.avg_dep_dly); });
 
-					//Width and height of SVG canvas
-					var w = 1000;
-					var h = 600;
+				//Remove any previous axes for a refresh property
+				d3.selectAll("g.axis").remove();
 
-					//X-padding
-			    var x_pad = 60;
-			    //Y-padding
-			    var y_pad = 40;
+				//Add the x-axis
+				xAxisAdd = svg.append("g")
+				.attr("class", "axis")
+				.attr("transform","translate(" + x_pad + "," + (h-y_pad) + ")")
+					.call(xAxis);
 
-					//Create scale functions based on filtered data
-					xScale = d3.scaleTime()
-								   .domain([
-										d3.min(dataset, function(d) { return d.fl_date; }),
-										d3.max(dataset, function(d) { return d.fl_date; })
-									])
-								   .range([0, w - x_pad]);
+				//Add the y-axis
+				yAxisAdd = svg.append("g")
+				.attr("class", "axis")
+				.attr("transform","translate(" + x_pad + ",0)")
+				.call(yAxis);
 
-					yScale = d3.scaleLinear()
-									.domain([d3.min(dataset, function(d) { return d.avg_dep_dly; }),
-													 d3.max(dataset, function(d) { return d.avg_dep_dly; })])
-									.range([h - y_pad, 0]);
+				//Remove any previous lines as a refresh
+				d3.selectAll("path.line").remove();
 
-					//Create axes based on X and Y scales
-					var xAxis = d3.axisBottom(xScale);
-					var yAxis = d3.axisLeft(yScale);
-
-					//Define line generator
-					line = d3.line()
-								.x(function(d) { return xScale(d.fl_date) + x_pad; })
-								.y(function(d) { return yScale(d.avg_dep_dly); });
-
-					//Create zoom behavior
-					var zoom = d3.zoom()
-						.on("zoom", updateChart);
-
-					//Chart update behavior on zoom
-					function updateChart(){
-
-						//Recover the new scale
-				    var newX = d3.event.transform.rescaleX(xScale);
-						//var newY = d3.event.transform.rescaleY(yScale);
-
-						//Obtain the min and max time values from the new x scale domain
-						var xDomainMin = newX.domain()[0];
-						var xDomainMax = newX.domain()[1];
-
-						//Filter the dataset based on new x-scale
-						newDataset = dataset.filter(d=>d.fl_date>=xDomainMin
-																				&d.fl_date<=xDomainMax);
-
-						//Create new y scale based on filtered data
-						newY = d3.scaleLinear()
-										.domain([d3.min(newDataset, function(d) { return d.avg_dep_dly; }),
-														 d3.max(newDataset, function(d) { return d.avg_dep_dly; })])
-										.range([h - y_pad, 0]);
-
-						//Update axes with the new boundaries
-				    xAxisAdd.call(d3.axisBottom(newX));
-						yAxisAdd.call(d3.axisLeft(newY));
-
-						//Create new line path with updated x-scale and same y-scale
-						newLine = d3.line()
-									.x(function(d) { return newX(d.fl_date); })
-									.y(function(d) { return newY(d.avg_dep_dly); });
-
-						//Update each line with the new line path
-						line1Add.attr("d", newLine);
-						line2Add.attr("d", newLine);
-						line3Add.attr("d", newLine);
-						line4Add.attr("d", newLine);
-						line5Add.attr("d", newLine);
-						line6Add.attr("d", newLine);
-						line7Add.attr("d", newLine);
-						line8Add.attr("d", newLine);
-						line9Add.attr("d", newLine);
-
-					};
-
-					//Create the SVG element for the canvas
-					var svg = d3.select("body")
-								.append("svg")
-								.attr("width", w)
-								.attr("height", h)
-								.call(zoom);
+				//Create a line of filtered data based on each user input
+				line1Add = svg.append("path")
+					.datum(dataset1)
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "line")
+					.attr("stroke", "seagreen")
+					.attr("stroke-width", "2px")
+					.attr("fill", "none")
+					.attr("d", line);
 
 
-				  var clip = svg.append("clipPath")
-				      .attr("id", "clip")
-				    .append("rect")
-				      .attr("x", x_pad)
-				      .attr("y", 0)
-				      .attr("width", w)
-				      .attr("height", h-y_pad);
+				line2Add = svg.append("path")
+					.datum(dataset2)
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "line")
+					.attr("stroke", "slategray")
+					.attr("stroke-width", "2px")
+					.attr("fill", "none")
+					.attr("d", line);
+
+				line3Add = svg.append("path")
+					.datum(dataset3)
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "line")
+					.attr("stroke", "darkred")
+					.attr("stroke-width", "2px")
+					.attr("fill", "none")
+					.attr("d", line);
+
+				line4Add = svg.append("path")
+					.datum(dataset4)
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "line")
+					.attr("stroke", "yellowgreen")
+					.attr("stroke-width", "2px")
+					.attr("fill", "none")
+					.attr("d", line);
+
+				line5Add = svg.append("path")
+					.datum(dataset5)
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "line")
+					.attr("stroke", "orchid")
+					.attr("stroke-width", "2px")
+					.attr("fill", "none")
+					.attr("d", line);
+
+				line6Add = svg.append("path")
+					.datum(dataset6)
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "line")
+					.attr("stroke", "skyblue")
+					.attr("stroke-width", "2px")
+					.attr("fill", "none")
+					.attr("d", line);
+
+				line7Add = svg.append("path")
+					.datum(dataset7)
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "line")
+					.attr("stroke", "indigo")
+					.attr("stroke-width", "2px")
+					.attr("fill", "none")
+					.attr("d", line);
+
+				line8Add = svg.append("path")
+					.datum(dataset8)
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "line")
+					.attr("stroke", "gold")
+					.attr("stroke-width", "2px")
+					.attr("fill", "none")
+					.attr("d", line);
+
+				line9Add = svg.append("path")
+					.datum(dataset9)
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "line")
+					.attr("stroke", "cornflowerblue")
+					.attr("stroke-width", "2px")
+					.attr("fill", "none")
+					.attr("d", line);
+				});
+
+				svg.call(zoom.transform, d3.zoomIdentity);
+			}
 
 
+			//Chart update behavior on zoom
+			function updateChart(){
 
-					//Add the x-axis
-					var xAxisAdd = svg.append("g")
-					.attr("class", "axis")
-					.attr("transform","translate(" + x_pad + "," + (h-y_pad) + ")")
-						.call(xAxis);
+				//Recover the new scale
+				xScaleNew = d3.event.transform.rescaleX(xScale);
 
-				  //Add the y-axis
-					var yAxisAdd = svg.append("g")
-					.attr("class", "axis")
-					.attr("transform","translate(" + x_pad + ",0)")
-					.call(yAxis);
+				//Obtain the min and max time values from the new x scale domain
+				var xDomainMin = xScaleNew.domain()[0];
+				var xDomainMax = xScaleNew.domain()[1];
 
-					//Create a line of filtered data based on each user input
-					var line1Add = svg.append("path")
-						.datum(dataset1)
-						.attr("clip-path", "url(#clip)")
-						.attr("class", "line")
-						.attr("stroke", "seagreen")
-						.attr("stroke-width", "2px")
-						.attr("fill", "none")
-						.attr("d", line);
+				//Filter the dataset based on new x-scale
+				newDataset = datasetGlobal.filter(d=>d.fl_date>=xDomainMin
+																		&d.fl_date<=xDomainMax);
 
-					var line2Add = svg.append("path")
-						.datum(dataset2)
-						.attr("clip-path", "url(#clip)")
-						.attr("class", "line")
-						.attr("stroke", "slategray")
-						.attr("stroke-width", "2px")
-						.attr("fill", "none")
-						.attr("d", line);
+				//Create new y scale based on filtered data
+				yScaleNew = d3.scaleLinear()
+								.domain([d3.min(newDataset, function(d) { return d.avg_dep_dly; }),
+												 d3.max(newDataset, function(d) { return d.avg_dep_dly; })])
+								.range([h - y_pad, 0]);
 
-					var line3Add = svg.append("path")
-						.datum(dataset3)
-						.attr("clip-path", "url(#clip)")
-						.attr("class", "line")
-						.attr("stroke", "darkred")
-						.attr("stroke-width", "2px")
-						.attr("fill", "none")
-						.attr("d", line);
+				//Update axes with the new boundaries
+				xAxisAdd.call(d3.axisBottom(xScaleNew));
+				yAxisAdd.call(d3.axisLeft(yScaleNew));
 
-					var line4Add = svg.append("path")
-						.datum(dataset4)
-						.attr("clip-path", "url(#clip)")
-						.attr("class", "line")
-						.attr("stroke", "yellowgreen")
-						.attr("stroke-width", "2px")
-						.attr("fill", "none")
-						.attr("d", line);
+				//Create new line path with updated x-scale and same y-scale
+				newLine = d3.line()
+							.x(function(d) { return xScaleNew(d.fl_date); })
+							.y(function(d) { return yScaleNew(d.avg_dep_dly); });
 
-					var line5Add = svg.append("path")
-						.datum(dataset5)
-						.attr("clip-path", "url(#clip)")
-						.attr("class", "line")
-						.attr("stroke", "orchid")
-						.attr("stroke-width", "2px")
-						.attr("fill", "none")
-						.attr("d", line);
+				//Update each line with the new line path
+				line1Add.attr("d", newLine);
+				line2Add.attr("d", newLine);
+				line3Add.attr("d", newLine);
+				line4Add.attr("d", newLine);
+				line5Add.attr("d", newLine);
+				line6Add.attr("d", newLine);
+				line7Add.attr("d", newLine);
+				line8Add.attr("d", newLine);
+				line9Add.attr("d", newLine);
 
-					var line6Add = svg.append("path")
-						.datum(dataset6)
-						.attr("clip-path", "url(#clip)")
-						.attr("class", "line")
-						.attr("stroke", "skyblue")
-						.attr("stroke-width", "2px")
-						.attr("fill", "none")
-						.attr("d", line);
+			};
 
-					var line7Add = svg.append("path")
-						.datum(dataset7)
-						.attr("clip-path", "url(#clip)")
-						.attr("class", "line")
-						.attr("stroke", "indigo")
-						.attr("stroke-width", "2px")
-						.attr("fill", "none")
-						.attr("d", line);
-
-					var line8Add = svg.append("path")
-						.datum(dataset8)
-						.attr("clip-path", "url(#clip)")
-						.attr("class", "line")
-						.attr("stroke", "gold")
-						.attr("stroke-width", "2px")
-						.attr("fill", "none")
-						.attr("d", line);
-
-					var line9Add = svg.append("path")
-						.datum(dataset9)
-						.attr("clip-path", "url(#clip)")
-						.attr("class", "line")
-						.attr("stroke", "cornflowerblue")
-						.attr("stroke-width", "2px")
-						.attr("fill", "none")
-						.attr("d", line);
-
-			})
-		}
 
 		</script>
 	</body>
