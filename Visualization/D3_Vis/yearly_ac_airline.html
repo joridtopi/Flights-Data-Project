@@ -5,32 +5,82 @@
 		<title>Number of Aircraft Per Year</title>
 		<script type="text/javascript" src="d3.js"></script>
 		<style type="text/css">
-			/* No style rules here yet */
+		p {
+			font-family: Helvetica, sans-serif;
+			font-size: 14px;
+			font-weight: bold;
+		}
+
+		input[type=checkbox] {
+			margin-left: 5px;
+		}
 		</style>
 	</head>
 	<body>
-		<select id="airlineList" onchange=get_chart()>
-			<option>Select Airline...</option>
-			<option>Alaska Airlines Inc.</option>
-			<option>American Airlines Inc.</option>
-			<option>Delta Air Lines Inc.</option>
-			<option>Frontier Airlines Inc.</option>
-			<option>Hawaiian Airlines Inc.</option>
-			<option>JetBlue Airways</option>
-			<option>Southwest Airlines Co.</option>
-			<option>Spirit Air Lines</option>
-			<option>United Air Lines Inc.</option>
-		</select>
+		<p>
+		<input type="radio" id="input1" name="airline" value="Alaska Airlines Inc.">
+		<label for="airline1" style="color:seagreen"> Alaska Airlines</label>
+		<input type="radio" id="input2" name="airline" value="American Airlines Inc.">
+		<label for="airline2" style="color:slategray"> American Airlines</label>
+		<input type="radio" id="input3" name="airline" value="Delta Air Lines Inc.">
+		<label for="airline3" style="color:darkred"> Delta Air Lines</label>
+		<input type="radio" id="input4" name="airline" value="Frontier Airlines Inc.">
+		<label for="airline4" style="color:yellowgreen"> Frontier Airlines</label>
+		<input type="radio" id="input5" name="airline" value="Hawaiian Airlines Inc.">
+		<label for="airline5" style="color:orchid"> Hawaiian Airlines</label>
+		<input type="radio" id="input6" name="airline" value="JetBlue Airways">
+		<label for="airline6" style="color:skyblue"> JetBlue Airways</label>
+		<input type="radio" id="input7" name="airline" value="Southwest Airlines Co.">
+		<label for="airline7" style="color:indigo"> Southwest Airlines</label>
+		<input type="radio" id="input8" name="airline" value="Spirit Air Lines">
+		<label for="airline8" style="color:gold"> Spirit Airlines</label>
+		<input type="radio" id="input9" name="airline" value="United Air Lines Inc.">
+		<label for="airline9" style="color:cornflowerblue"> United Airlines</label>
+		</p>
 
 		<script type="text/javascript">
 
 			var testdata = [];
 
-			function get_chart(){
+			//Create event to listen for user input clicks to update data
+			d3.selectAll('input')
+				.on("click", getData);
+
+			function getData(){
 
 				d3.select("svg").remove();
 
-				var airline_name = document.getElementById("airlineList").value;
+				var airline_name = document.querySelector('input[name=airline]:checked').value;
+
+				//var airline_name = document.getElementByName("airline").value;
+
+				if(airline_name == "Alaska Airlines Inc."){
+					var airline_color = "seagreen";
+				}
+				else if(airline_name == "American Airlines Inc."){
+					var airline_color = "slategray";
+				}
+				else if(airline_name == "Delta Air Lines Inc."){
+					var airline_color = "darkred";
+				}
+				else if(airline_name == "Frontier Airlines Inc."){
+					var airline_color = "yellowgreen";
+				}
+				else if(airline_name == "Hawaiian Airlines Inc."){
+					var airline_color = "orchid";
+				}
+				else if(airline_name == "JetBlue Airways"){
+					var airline_color = "skyblue";
+				}
+				else if(airline_name == "Southwest Airlines Co."){
+					var airline_color = "indigo";
+				}
+				else if(airline_name == "Spirit Air Lines"){
+					var airline_color = "gold";
+				}
+				else if(airline_name == "United Air Lines Inc."){
+					var airline_color = "cornflowerblue";
+				};
 
 				const yearlyaircraft_url = 'http://localhost:3000/aircraft/year';
 
@@ -49,7 +99,7 @@
 					testdata.push(dataset);
 
 					//Width and height
-					var w = 1000;
+					var w = 1100;
 					var h = 600;
 
 					//X-padding
@@ -99,9 +149,8 @@
 						 .attr("height", function(d) {
 								return yScale(d.count);
 						 })
-						 .attr("fill", function(d) {
-							return "rgb(0, 0, 150)";
-						 });
+						 .attr("fill", airline_color);
+
 
 						 //Create x-axis
 						 svg.append("g")
