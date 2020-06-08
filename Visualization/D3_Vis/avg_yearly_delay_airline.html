@@ -32,6 +32,34 @@
 
 				var airline_name = document.getElementById("airlineList").value;
 
+				if(airline_name == "Alaska Airlines Inc."){
+					var airline_color = "seagreen";
+				}
+				else if(airline_name == "American Airlines Inc."){
+					var airline_color = "slategray";
+				}
+				else if(airline_name == "Delta Air Lines Inc."){
+					var airline_color = "darkred";
+				}
+				else if(airline_name == "Frontier Airlines Inc."){
+					var airline_color = "yellowgreen";
+				}
+				else if(airline_name == "Hawaiian Airlines Inc."){
+					var airline_color = "orchid";
+				}
+				else if(airline_name == "JetBlue Airways"){
+					var airline_color = "skyblue";
+				}
+				else if(airline_name == "Southwest Airlines Co."){
+					var airline_color = "indigo";
+				}
+				else if(airline_name == "Spirit Air Lines"){
+					var airline_color = "gold";
+				}
+				else if(airline_name == "United Air Lines Inc."){
+					var airline_color = "cornflowerblue";
+				};
+
 				const depdelays_url = 'http://localhost:3000/depdelays/year';
 
 				//Graphic for Average Departure delays for each year for selected airline
@@ -56,13 +84,17 @@
 			    //Y-padding
 			    var y_pad = 40;
 
+					var yDomainMinMargin = (d3.max(dataset, function(d){return d.avg_dep_dly;}) - d3.min(dataset, function(d){return d.avg_dep_dly;})) * 0.1
+					var yDomainMin = d3.min(dataset, function(d){return d.avg_dep_dly;}) - yDomainMinMargin;
+
 			    var xScale = d3.scaleBand()
 			            .domain(d3.range(dataset.length))
 			            .rangeRound([0, w-x_pad])
 			            .paddingInner(0.05);
 
 			    var yScale = d3.scaleLinear()
-			            .domain([0, d3.max(dataset, function(d){return d.avg_dep_dly;})])
+			            .domain([yDomainMin,
+													 d3.max(dataset, function(d){return d.avg_dep_dly;})])
 			            .range([0, h-y_pad]);
 
 			    var xAxisScale = d3.scaleBand()
@@ -70,7 +102,8 @@
 			        .rangeRound([0, w-x_pad]);
 
 			    var yAxisScale = d3.scaleLinear()
-			            .domain([0, d3.max(dataset, function(d){return d.avg_dep_dly;})])
+			            .domain([yDomainMin,
+													 d3.max(dataset, function(d){return d.avg_dep_dly;})])
 			            .range([h-y_pad,0]);
 
 			    var xAxis = d3.axisBottom(xAxisScale);
@@ -98,9 +131,7 @@
 			       .attr("height", function(d) {
 			          return yScale(d.avg_dep_dly);
 			       })
-			       .attr("fill", function(d) {
-			        return "rgb(0, 0, " + Math.round(d.avg_dep_dly * 10) + ")";
-			       });
+			       .attr("fill", airline_color);
 
 			    //Create x-axis
 			      svg.append("g")
