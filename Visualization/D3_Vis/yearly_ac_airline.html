@@ -14,6 +14,33 @@
 		input[type=checkbox] {
 			margin-left: 5px;
 		}
+
+		#tooltip {
+			position: absolute;
+			width: 200px;
+			height: auto;
+			padding: 10px;
+			background-color: white;
+			-webkit-border-radius: 10px;
+			-moz-border-radius: 10px;
+			border-radius: 10px;
+			-webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+			-moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+			box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+			pointer-events: none;
+		}
+
+		#tooltip.hidden {
+			display: none;
+		}
+
+		#tooltip p {
+			margin: 0;
+			font-family: sans-serif;
+			font-size: 16px;
+			line-height: 20px;
+		}
+
 		</style>
 	</head>
 	<body>
@@ -38,9 +65,15 @@
 		<label for="airline9" style="color:cornflowerblue"> United Airlines</label>
 		</p>
 
+		<div id="tooltip" class="hidden">
+			<p><strong>Number of Aircraft Used</strong></p>
+			<p><span id="value">100</span></p>
+		</div>
+
 		<script type="text/javascript">
 
 			var testdata = [];
+			var svg = [];
 
 			//Create event to listen for user input clicks to update data
 			d3.selectAll('input')
@@ -129,7 +162,7 @@
 			    var yAxis = d3.axisLeft(yAxisScale);
 
 					//Create SVG element
-					var svg = d3.select("body")
+					svg = d3.select("body")
 								.append("svg")
 								.attr("width", w)
 								.attr("height", h);
@@ -149,7 +182,40 @@
 						 .attr("height", function(d) {
 								return yScale(d.count);
 						 })
-						 .attr("fill", airline_color);
+						 .attr("fill", airline_color)
+						 .on("click", function(d){
+							 console.log(d);
+						 })
+						 .on("mouseover", function(d){
+							 d3.select(this)
+							 	.attr("fill", "whitesmoke")
+								.attr("stroke", airline_color);
+
+							//Get this bar's x/y values, then augment for the tooltip
+							var xPosition = parseFloat(d3.select(this).attr("x")) + xScale.bandwidth() / 2;
+							var yPosition = parseFloat(d3.select(this).attr("y")) / 2 + h / 2;
+
+							//Update the tooltip position and value
+							d3.select("#tooltip")
+								.style("left", xPosition + "px")
+								.style("top", yPosition + "px")
+								.select("#value")
+								.text(d.count);
+
+							//Show the tooltip
+							d3.select("#tooltip").classed("hidden", false);
+
+						 })
+						 .on("mouseout", function(d){
+							 d3.select(this)
+							 	.transition()
+								.duration(250)
+							 	.attr("fill", airline_color);
+
+							//Hide the tooltip
+							d3.select("#tooltip").classed("hidden", true);
+
+						 });
 
 
 						 //Create x-axis
@@ -172,6 +238,8 @@
 					});
 
 				}
+
+
 
 		</script>
 	</body>
