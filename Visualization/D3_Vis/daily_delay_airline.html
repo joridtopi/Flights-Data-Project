@@ -45,6 +45,7 @@
 	</head>
 	<body>
 		<p>
+		Select Month <input type="month" id="inputMonth" min="1987-01" max="2019-12"><br><br>
 		<input type="radio" id="input1" name="airline" value="Alaska Airlines Inc.">
 		<label for="airline1" style="color:seagreen"> Alaska Airlines</label>
 		<input type="radio" id="input2" name="airline" value="American Airlines Inc.">
@@ -66,8 +67,9 @@
 		</p>
 
 		<div id="tooltip" class="hidden">
-			<p><strong>Average Yearly Delay</strong></p>
-			<p><span id="value">100</span> minutes</p>
+			<p><strong>Departure Delay: Daily Average</strong></p>
+			<p>Date: <span id="date">100</span></p>
+			<p>Avg Delay: <span id="value">100</span> Minutes</p>
 		</div>
 
 		<script type="text/javascript">
@@ -76,16 +78,26 @@
 
 			//Create event to listen for user input clicks to update data
 			d3.selectAll('input')
-				.on("click", getData);
+				.on("change", getData);
 
 			function getData(){
 
 				d3.select("svg").remove();
 
+				//Get airline name from input radio buttons
 				var airline_name = document.querySelector('input[name=airline]:checked').value;
 
-				//var airline_name = document.getElementByName("airline").value;
+				//Get input month and convert from UTC time (add one day)
+				inputMonth = document.getElementById("inputMonth").value;
+				inputDateRaw = new Date(String(inputMonth));
+				inputDateRaw.setDate(inputDateRaw.getDate() + 1);
+				inputDateRawYear = inputDateRaw.getFullYear();
+				inputDateRawMonth = inputDateRaw.getMonth()+1;
+				//Obtain Year and Month from input to filter by
+				yearFilter = inputDateRawYear;
+				monthFilter = inputDateRawMonth;
 
+				//Set the chart color code by selected airline
 				if(airline_name == "Alaska Airlines Inc."){
 					var airline_color = "seagreen";
 				}
@@ -114,20 +126,32 @@
 					var airline_color = "cornflowerblue";
 				};
 
-				const depdelays_url = 'http://localhost:3000/depdelays/year';
+				//URL for the data API
+				const depdelays_url = 'http://localhost:3000/depdelays/daily';
 
 				//Graphic for Average Departure delays for each year for selected airline
 			  d3.json(depdelays_url)
 			  .then(function(dataset) {
 
+					//Conver the API data to float and date formats
 			    dataset.forEach(function(d){
 			      d.avg_dep_dly = +d.avg_dep_dly;
+						d.fl_date = new Date(String(d.fl_date));
+			    });
+
+					//Extract the time elements from date string and reformat date for display
+					dataset.forEach(function(d){
+						d.year = d.fl_date.getFullYear();
+			      d.month = d.fl_date.getMonth()+1;
+						d.day = d.fl_date.getDate();
+						d.newDate = d.month + "/" + d.day + "/" + d.year;
 			    });
 
 					//Create filtered datasets based on user input
-					dataset = dataset.filter(d=>d.carrier_name==airline_name)
+					dataset = dataset.filter(d=>d.carrier_name==airline_name
+																			& d.year==yearFilter
+																			& d.month==monthFilter);
 
-			    testdata.push(dataset);
 
 			    //Width and height
 			    var w = 1200;
@@ -136,11 +160,13 @@
 			    //X-padding
 			    var x_pad = 60;
 			    //Y-padding
-			    var y_pad = 40;
+			    var y_pad = 60;
 
+					//Set the y-domain for the bar graph according to the y data range
 					var yDomainMinMargin = (d3.max(dataset, function(d){return d.avg_dep_dly;}) - d3.min(dataset, function(d){return d.avg_dep_dly;})) * 0.3
 					var yDomainMin = d3.min(dataset, function(d){return d.avg_dep_dly;}) - yDomainMinMargin;
 
+					//Obtain X and Y scales
 			    var xScale = d3.scaleBand()
 			            .domain(d3.range(dataset.length))
 			            .rangeRound([0, w-x_pad])
@@ -152,7 +178,7 @@
 			            .range([0, h-y_pad]);
 
 			    var xAxisScale = d3.scaleBand()
-			        .domain(dataset.map(function(d){return d.fl_year;}))
+			        .domain(dataset.map(function(d){return d.newDate;}))
 			        .rangeRound([0, w-x_pad]);
 
 			    var yAxisScale = d3.scaleLinear()
@@ -160,8 +186,8 @@
 													 d3.max(dataset, function(d){return d.avg_dep_dly;})])
 			            .range([h-y_pad,0]);
 
+					//Create X and Y axes
 			    var xAxis = d3.axisBottom(xAxisScale);
-
 			    var yAxis = d3.axisLeft(yAxisScale);
 
 			    //Create SVG element
@@ -199,6 +225,11 @@
 							d3.select("#tooltip")
 								.style("left", xPosition + "px")
 								.style("top", yPosition + "px")
+								.select("#date")
+								.text(d.newDate);
+
+							//Update the tooltip position and value
+							d3.select("#tooltip")
 								.select("#value")
 								.text(Math.round(d.avg_dep_dly * 100) / 100);
 
