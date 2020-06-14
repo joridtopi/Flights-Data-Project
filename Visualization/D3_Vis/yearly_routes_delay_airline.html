@@ -82,10 +82,6 @@
 
 		<script type="text/javascript">
 
-			var testdata = [];
-			var delayMax = [];
-			var delayMin= [];
-			var height = [];
 
 			//Create event to listen for user input clicks to update data
 			d3.selectAll('input')
@@ -95,12 +91,12 @@
 
 				d3.select("svg").remove();
 
+				//Fetch user inputs
 				var airline_name = document.querySelector('input[name=airline]:checked').value;
 				var input_year = document.getElementById('inputYear').value;
 				var input_count = document.getElementById('inputCount').value;
 
-				//var airline_name = document.getElementByName("airline").value;
-
+				//Fetch airline color based on user input
 				if(airline_name == "Alaska Airlines Inc."){
 					var airline_color = "seagreen";
 				}
@@ -129,16 +125,14 @@
 					var airline_color = "cornflowerblue";
 				};
 
-
+				//Fetch data
 				const yearlyroutes_url = 'http://localhost:3000/yearlyroutes/airline';
 
 				//Graphic of number of unique routes for each year for selected airline
 				d3.json(yearlyroutes_url)
 				.then(function(dataset) {
 
-					//var airline_name = "American Airlines Inc.";
-					var flight_year = "2019";
-
+					//Data type conversions
 					dataset.forEach(function(d){
 						d.avg_dep_dly = +d.avg_dep_dly;
 						d.count= +d.count
@@ -149,31 +143,20 @@
 					dataset = dataset.filter(d=>d.carrier_name==airline_name
 																			& d.fl_year==input_year
 																			& d.count>=input_count);
-					//dataset = dataset.slice(1,818);
-
-					testdata.push(dataset);
-
-
-
 
 					//X-padding
 			    var x_pad = 60;
 			    //Y-padding
 			    var y_pad = 40;
 
-
 					//Width and height
 					var w = 1100;
 					//var h = 600;
 					var h = dataset.length * 35;
 
-
-
-
 					//Set the y-domain for the bar graph according to the y data range
 					var yDomainMinMargin = (d3.max(dataset, function(d){return d.avg_dep_dly;}) - d3.min(dataset, function(d){return d.avg_dep_dly;})) * 0.3
 					var yDomainMin = d3.min(dataset, function(d){return d.avg_dep_dly;}) - yDomainMinMargin;
-
 
 					var xScaleNew = d3.scaleLinear()
 			            .domain([yDomainMin,
@@ -188,17 +171,10 @@
 					delayMax = d3.range(dataset.length);
 				  delayMin = d3.min(dataset, function(d){return d.avg_dep_dly});
 
-
-					/*var xAxisScaleNew = d3.scaleLinear()
-			            .domain([yDomainMin,
-													 d3.max(dataset, function(d){return d.avg_dep_dly;})])
-			            .range([0, w-x_pad]);*/
-
+					//Generate Y-axis
 					var yAxisScaleNew = d3.scaleBand()
 			        .domain(dataset.map(function(d){return d.origin_dest;}))
 			        .rangeRound([h,0]);
-
-			    //var xAxis = d3.axisBottom(xAxisScaleNew);
 
 			    var yAxis = d3.axisLeft(yAxisScaleNew);
 
@@ -215,19 +191,15 @@
 						 .append("rect")
 						 .attr("x", function(d) {
 							 	return x_pad;
-								//return xScale(i) + x_pad;
 						 })
 						 .attr("y", function(d, i) {
 							 	return yScaleNew(i);
-								//return h - yScale(d.avg_dep_dly) - y_pad;
 						 })
 						 .attr("width", function(d){
 							 return xScaleNew(d.avg_dep_dly);
 						 })
 						 .attr("height", function(d) {
-							 	//return 31;
 							 	return yScaleNew.bandwidth();
-								//return yScale(d.avg_dep_dly);
 						 })
 						 .attr("fill", airline_color)
 						 .on("mouseover", function(d){
@@ -266,9 +238,6 @@
 								.select("#countDisp")
 								.text(d.count);
 
-
-
-
 							//Show the tooltip
 							d3.select("#tooltip").classed("hidden", false);
 
@@ -284,6 +253,7 @@
 							d3.select("#tooltip").classed("hidden", true);
 						 });
 
+				 //Add text values to each bar
 				 svg.selectAll("text")
 				 		.data(dataset)
 						.enter()
@@ -299,8 +269,6 @@
 						})
 						.attr("font-family", "sans-serif")
 						.attr("fill", "whitesmoke");
-
-
 
  			   //Create y-axis
  			    svg.append("g")
