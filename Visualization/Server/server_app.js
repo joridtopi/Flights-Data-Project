@@ -11,6 +11,7 @@ app.get('/depdelays/year', db.getFlightDelays);
 app.get('/depdelays/daily', db.getFlightDelaysDaily);
 app.get('/yearlyroutes/year', db.getFlightRoutes);
 app.get('/yearlyroutes/airline', db.getFlightRoutesAirline);
+app.get('/yearlyroutes/count/airline', db.getFlightRoutesCountAirline);
 app.get('/aircraft/year/', db.getAircraftCount);
 
 

@@ -82,6 +82,32 @@ const getFlightRoutesAirline = (request, response) => {
   });
 }
 
+const getFlightRoutesCountAirline = (request, response) => {
+  const query = `
+  SELECT fl_year, origin,
+    		dest,
+    		carrier_name,
+    		count,
+    		avg_dep_dly,
+    		avg_arr_dly,
+    		origin.airport_name AS origin_airport_name,
+    		dest.airport_name AS dest_airport_name
+  FROM airline_yearly_route_analysis
+  JOIN airport_lookup AS origin ON airline_yearly_route_analysis.origin = origin.code
+  JOIN airport_lookup AS dest ON airline_yearly_route_analysis.dest = dest.code
+  ORDER BY count ASC;
+  `;
+  pool.query(query, (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  });
+}
+
+
+
+
 const getAircraftCount = (request, response) => {
   const id = request.params.id;
   const query = `
@@ -103,6 +129,7 @@ module.exports = {
   getFlightDelaysDaily,
   getFlightRoutes,
   getFlightRoutesAirline,
+  getFlightRoutesCountAirline,
   getAircraftCount
 }
 

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Number of Routes Per Year</title>
+		<script type="text/javascript" src="d3.js"></script>
+		<style type="text/css">
+		p {
+			font-family: Helvetica, sans-serif;
+			font-size: 14px;
+			font-weight: bold;
+		}
+
+		input[type=checkbox] {
+			margin-left: 5px;
+		}
+
+		#tooltip {
+			position: absolute;
+			width: 200px;
+			height: auto;
+			padding: 10px;
+			background-color: white;
+			-webkit-border-radius: 10px;
+			-moz-border-radius: 10px;
+			border-radius: 10px;
+			-webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+			-moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+			box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+			pointer-events: none;
+		}
+
+		#tooltip.hidden {
+			display: none;
+		}
+
+		#tooltip p {
+			margin: 0;
+			font-family: sans-serif;
+			font-size: 16px;
+			line-height: 20px;
+		}
+
+		</style>
+	</head>
+	<body>
+		<p>
+		Select Year:
+		<input type="number" id="inputYear" min="1987" max="2019" step="1" value = "2019"/>
+		<br><br>
+		<input type="radio" id="input1" name="airline" value="Alaska Airlines Inc.">
+		<label for="airline1" style="color:seagreen"> Alaska Airlines</label>
+		<input type="radio" id="input2" name="airline" value="American Airlines Inc.">
+		<label for="airline2" style="color:slategray"> American Airlines</label>
+		<input type="radio" id="input3" name="airline" value="Delta Air Lines Inc.">
+		<label for="airline3" style="color:darkred"> Delta Airlines</label>
+		<input type="radio" id="input4" name="airline" value="Frontier Airlines Inc.">
+		<label for="airline4" style="color:yellowgreen"> Frontier Airlines</label>
+		<input type="radio" id="input5" name="airline" value="Hawaiian Airlines Inc.">
+		<label for="airline5" style="color:orchid"> Hawaiian Airlines</label>
+		<input type="radio" id="input6" name="airline" value="JetBlue Airways">
+		<label for="airline6" style="color:skyblue"> JetBlue Airways</label>
+		<input type="radio" id="input7" name="airline" value="Southwest Airlines Co.">
+		<label for="airline7" style="color:indigo"> Southwest Airlines</label>
+		<input type="radio" id="input8" name="airline" value="Spirit Air Lines">
+		<label for="airline8" style="color:gold"> Spirit Airlines</label>
+		<input type="radio" id="input9" name="airline" value="United Air Lines Inc.">
+		<label for="airline9" style="color:cornflowerblue"> United Airlines</label>
+		</p>
+
+		<div id="tooltip" class="hidden">
+			<p><strong>Airline: </strong><span id="airlineDisp"></span></p><br>
+			<p><strong>Origin - </strong><span id="originDisp"></span></p><br>
+			<p><strong>Dest - </strong><span id="destDisp"></span></p><br>
+			<p><strong>Year: </strong><span id="yearDisp"></span></p><br>
+			<p><strong>Average Departure Delay: </strong><span id="value">100</span> Minutes</p><br>
+			<p><strong>Number of Flights: </strong><span id="countDisp"></span></p>
+		</div>
+
+
+		<script type="text/javascript">
+
+
+			//Create event to listen for user input clicks to update data
+			d3.selectAll('input')
+				.on("change", getData);
+
+			function getData(){
+
+				d3.select("svg").remove();
+
+				//Fetch user inputs
+				var airline_name = document.querySelector('input[name=airline]:checked').value;
+				var input_year = document.getElementById('inputYear').value;
+
+				//Fetch airline color based on user input
+				if(airline_name == "Alaska Airlines Inc."){
+					var airline_color = "seagreen";
+				}
+				else if(airline_name == "American Airlines Inc."){
+					var airline_color = "slategray";
+				}
+				else if(airline_name == "Delta Air Lines Inc."){
+					var airline_color = "darkred";
+				}
+				else if(airline_name == "Frontier Airlines Inc."){
+					var airline_color = "yellowgreen";
+				}
+				else if(airline_name == "Hawaiian Airlines Inc."){
+					var airline_color = "orchid";
+				}
+				else if(airline_name == "JetBlue Airways"){
+					var airline_color = "skyblue";
+				}
+				else if(airline_name == "Southwest Airlines Co."){
+					var airline_color = "indigo";
+				}
+				else if(airline_name == "Spirit Air Lines"){
+					var airline_color = "gold";
+				}
+				else if(airline_name == "United Air Lines Inc."){
+					var airline_color = "cornflowerblue";
+				};
+
+				//Fetch data
+				const yearlyroutes_url = 'http://localhost:3000/yearlyroutes/count/airline';
+
+				//Graphic of number of unique routes for each year for selected airline
+				d3.json(yearlyroutes_url)
+				.then(function(dataset) {
+
+					//Data type conversions
+					dataset.forEach(function(d){
+						d.avg_dep_dly = +d.avg_dep_dly;
+						d.count= +d.count
+						d.origin_dest = d.origin + "-" + d.dest;
+					});
+
+					//Create filtered datasets based on user input
+					dataset = dataset.filter(d=>d.carrier_name==airline_name
+																			& d.fl_year==input_year);
+
+					//X-padding
+			    var x_pad = 60;
+			    //Y-padding
+			    var y_pad = 40;
+
+					//Width and height
+					var w = 1100;
+					//var h = 600;
+					var h = dataset.length * 35;
+
+					//Set the y-domain for the bar graph according to the y data range
+					var yDomainMinMargin = (d3.max(dataset, function(d){return d.count;}) - d3.min(dataset, function(d){return d.count;})) * 0.3
+					var yDomainMin = d3.min(dataset, function(d){return d.count;}) - yDomainMinMargin;
+
+					var xScaleNew = d3.scaleLinear()
+			            .domain([yDomainMin,
+													 d3.max(dataset, function(d){return d.count;})])
+			            .range([0, w-x_pad]);
+
+					var yScaleNew = d3.scaleBand()
+									.domain(d3.range(dataset.length))
+									.rangeRound([h, 0])
+									.paddingInner(0.05);
+
+					delayMax = d3.range(dataset.length);
+				  delayMin = d3.min(dataset, function(d){return d.count});
+
+					//Generate Y-axis
+					var yAxisScaleNew = d3.scaleBand()
+			        .domain(dataset.map(function(d){return d.origin_dest;}))
+			        .rangeRound([h,0]);
+
+			    var yAxis = d3.axisLeft(yAxisScaleNew);
+
+					//Create SVG element
+					var svg = d3.select("body")
+								.append("svg")
+								.attr("width", w)
+								.attr("height", h);
+
+					//Create bars
+					svg.selectAll("rect")
+						 .data(dataset)
+						 .enter()
+						 .append("rect")
+						 .attr("x", function(d) {
+							 	return x_pad;
+						 })
+						 .attr("y", function(d, i) {
+							 	return yScaleNew(i);
+						 })
+						 .attr("width", function(d){
+							 return xScaleNew(d.count);
+						 })
+						 .attr("height", function(d) {
+							 	return yScaleNew.bandwidth();
+						 })
+						 .attr("fill", airline_color)
+						 .on("mouseover", function(d){
+							 d3.select(this)
+							 	.attr("fill", "whitesmoke")
+								.attr("stroke", airline_color);
+
+							//Get this bar's x/y values, then augment for the tooltip
+							var xPosition = parseFloat(d3.select(this).attr("x")) + xScaleNew(d.count) / 2;
+							var yPosition = parseFloat(d3.select(this).attr("y")) + yScaleNew.bandwidth() / 2;
+
+							//Update the tooltip position and value
+							d3.select("#tooltip")
+								.style("left", xPosition + "px")
+								.style("top", yPosition + "px")
+								.select("#value")
+								.text(Math.round(d.avg_dep_dly * 100) / 100);
+
+							d3.select("#tooltip")
+								.select("#airlineDisp")
+								.text(d.carrier_name);
+
+							d3.select("#tooltip")
+								.select("#originDisp")
+								.text(d.origin_airport_name);
+
+							d3.select("#tooltip")
+								.select("#destDisp")
+								.text(d.dest_airport_name);
+
+							d3.select("#tooltip")
+								.select("#yearDisp")
+								.text(d.fl_year);
+
+							d3.select("#tooltip")
+								.select("#countDisp")
+								.text(d.count);
+
+							//Show the tooltip
+							d3.select("#tooltip").classed("hidden", false);
+
+						 })
+						 .on("mouseout", function(d){
+							 d3.select(this)
+							 	.transition()
+								.duration(250)
+							 	.attr("fill", airline_color)
+								.attr("stroke", "whitesmoke");;
+
+							//Hide the tooltip
+							d3.select("#tooltip").classed("hidden", true);
+						 });
+
+				 //Add text values to each bar
+				 svg.selectAll("text")
+				 		.data(dataset)
+						.enter()
+						.append("text")
+						.text(function(d){
+							return Math.round(d.count * 100) / 100;
+						})
+						.attr("y", function(d,i){
+							return yScaleNew(i) + yScaleNew.bandwidth() / 1.5;
+						})
+						.attr("x", function(d){
+							return xScaleNew(d.count);
+						})
+						.attr("font-family", "sans-serif")
+						.attr("fill", "whitesmoke");
+
+ 			   //Create y-axis
+ 			    svg.append("g")
+ 			    .attr("class", "axis")
+ 			    .attr("transform","translate(" + x_pad + ",0)")
+ 			    .call(yAxis);
+
+					});
+				}
+
+		</script>
+	</body>
+</html>

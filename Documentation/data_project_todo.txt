@@ -14,3 +14,22 @@ Use back up files of database dumps. Generate a dump periodically.
 
 - Come up with analysis questions, based on past project
 - Create new folder structure and repo for upload to github
+
+
+Chart Ideas:
+
+1. Total number of domestic flights from 1987 to 2019 on a:
+  - daily basis
+  - yearly basis
+  - airline basis
+This can be done by line paths
+2. The flight operator market share in:
+  - total marketshare from 1987 to 2019
+  - yearly marketshare
+This can be done with a pie chart
+3. Route Analysis, which operators have a particular route and what is their marketshare for that routes
+  - Percent marketshare on total 1987 to 2019
+  - Percent marketshare on a yearly basis
+  - Compare operator performance for that route
+
+-
