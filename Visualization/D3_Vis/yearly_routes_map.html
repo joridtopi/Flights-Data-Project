@@ -104,7 +104,7 @@
 				.projection(projection);
 
 
-			d3.json("chapter_12_us-states.json")
+			d3.json("us-states.json")
 			.then(function(json) {
 				svg.selectAll("path")
 					.data(json.features)
