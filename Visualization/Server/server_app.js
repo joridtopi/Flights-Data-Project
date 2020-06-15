@@ -13,6 +13,8 @@ app.get('/yearlyroutes/year', db.getFlightRoutes);
 app.get('/yearlyroutes/airline', db.getFlightRoutesAirline);
 app.get('/yearlyroutes/count/airline', db.getFlightRoutesCountAirline);
 app.get('/aircraft/year/', db.getAircraftCount);
+app.get('/yearlyroutes/geo/airline', db.getFlightRoutesGeoAirline);
+app.get('/yearlyroutes/geo', db.getFlightRoutesGeo);
 
 
 
