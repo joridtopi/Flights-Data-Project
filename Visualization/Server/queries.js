@@ -60,6 +60,7 @@ const getFlightRoutes = (request, response) => {
 
 
 const getFlightRoutesAirline = (request, response) => {
+  const id = request.params.id;
   const query = `
   SELECT fl_year, origin,
     		dest,
@@ -72,6 +73,7 @@ const getFlightRoutesAirline = (request, response) => {
   FROM airline_yearly_route_analysis
   JOIN airport_lookup AS origin ON airline_yearly_route_analysis.origin = origin.code
   JOIN airport_lookup AS dest ON airline_yearly_route_analysis.dest = dest.code
+  WHERE carrier_name = '${id}'
   ORDER BY avg_dep_dly ASC;
   `;
   pool.query(query, (error, results) => {
@@ -83,6 +85,7 @@ const getFlightRoutesAirline = (request, response) => {
 }
 
 const getFlightRoutesCountAirline = (request, response) => {
+  const id = request.params.id;
   const query = `
   SELECT fl_year, origin,
     		dest,
@@ -95,6 +98,7 @@ const getFlightRoutesCountAirline = (request, response) => {
   FROM airline_yearly_route_analysis
   JOIN airport_lookup AS origin ON airline_yearly_route_analysis.origin = origin.code
   JOIN airport_lookup AS dest ON airline_yearly_route_analysis.dest = dest.code
+  WHERE carrier_name = '${id}'
   ORDER BY count ASC;
   `;
   pool.query(query, (error, results) => {
@@ -107,6 +111,7 @@ const getFlightRoutesCountAirline = (request, response) => {
 
 
 const getFlightRoutesGeoAirline = (request, response) => {
+  const id = request.params.id;
   const query = `
   SELECT fl_year,
         origin,
@@ -152,6 +157,7 @@ const getFlightRoutesGeoAirline = (request, response) => {
   AND dest != 'STT'
   AND dest != 'STX'
   AND dest != 'YAP'
+  AND carrier_name = '${id}'
   ORDER BY avg_dep_dly ASC;
   `;
   pool.query(query, (error, results) => {
