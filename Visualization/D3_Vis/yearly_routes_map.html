@@ -47,7 +47,9 @@
 		<p>
 		Select Year:
 		<input type="number" id="inputYear" min="1987" max="2019" step="1" value = "2019"/>
-		<br><br>
+		Select Origin:
+		<input type="text" id="inputOrigin" value = "All Origins"/>
+		<br>
 		<input type="radio" id="input1" name="airline" value="Alaska Airlines Inc.">
 		<label for="airline1" style="color:seagreen"> Alaska Airlines</label>
 		<input type="radio" id="input2" name="airline" value="American Airlines Inc.">
@@ -80,57 +82,60 @@
 
 		<script type="text/javascript">
 
-			//X-padding
-			var x_pad = 60;
-			//Y-padding
-			var y_pad = 40;
+			var line_data = [];
+			var dataset1 = [];
 
-			//Width and height
-			var w = 1100;
-			var h = 600;
-
-
-			//Create SVG element
-			var svg = d3.select("body")
-						.append("svg")
-						.attr("width", w)
-						.attr("height", h);
-
-			var projection = d3.geoAlbersUsa()
-													.translate([w/2,h/2])
-													.scale([1300]);
-
-			var mapPath = d3.geoPath()
-				.projection(projection);
-
-
-			d3.json("us-states.json")
-			.then(function(json) {
-				svg.selectAll("path")
-					.data(json.features)
-					.enter()
-					.append("path")
-					.attr("class", "map")
-					.attr("d", mapPath)
-					.style("fill", "seagreen");
-			});
 
 			var testdata = [];
 
+			//await getData();
 			//Create event to listen for user input clicks to update data
 			d3.selectAll('input')
 				.on("change", getData);
 
-			function getData(){
+			function updateCharts(){
+				setTimeout(function(){
+						d3.selectAll("svg").remove();
+						getData();},
+					10000);
+			};
 
-				//d3.select("svg").remove();
+
+			function getData(){
+				d3.selectAll("svg").remove();
+				//X-padding
+				var x_pad = 60;
+				//Y-padding
+				var y_pad = 40;
+
+				//Width and height
+				var w = 1100;
+				var h = 600;
+
+
+				//Create SVG element
+				var svg = d3.select("body")
+							.append("svg")
+							.attr("width", w)
+							.attr("height", h)
+							.style("fill", "cornflowerblue");
+
+				svg.append("rect")
+			    .attr("width", "100%")
+			    .attr("height", "100%")
+			    .attr("fill", "gainsboro");
+
+				var projection = d3.geoAlbersUsa()
+														.translate([w/2,h/2])
+														.scale([1300]);
+
+				var mapPath = d3.geoPath()
+					.projection(projection);
 
 				//Fetch user inputs
 				var airline_name = document.querySelector('input[name=airline]:checked').value;
-				//var input_year = document.getElementById('inputYear').value;
-
-				var airline_name_test = "Frontier Airlines Inc.";
-				var input_year = "2019";
+				var input_origin = document.getElementById('inputOrigin').value;
+				var input_year = document.getElementById('inputYear').value;
 
 				//Fetch airline color based on user input
 				if(airline_name == "Alaska Airlines Inc."){
@@ -161,24 +166,24 @@
 					var airline_color = "cornflowerblue";
 				};
 
+				d3.json("us-states.json")
+				.then(function(json) {
+					svg.selectAll("path")
+						.data(json.features)
+						.enter()
+						.append("path")
+						.attr("class", "map")
+						.attr("d", mapPath)
+						.style("fill", airline_color);
+				});
+
 				//Fetch data
-				const yearlyroutes_url = 'http://localhost:3000/yearlyroutes/geo/airline';
+				const yearlyroutes_geo_url = 'http://localhost:3000/yearlyroutes/geo/airline';
+				const yearlyroutes_url = 'http://localhost:3000/yearlyroutes/count/airline';
 
 				//Graphic of number of unique routes for each year for selected airline
-				d3.json(yearlyroutes_url)
+				d3.json(yearlyroutes_geo_url)
 				.then(function(dataset) {
-
-					//Data type conversions
-					/*dataset.forEach(function(d){
-						d.avg_dep_dly = +d.avg_dep_dly;
-						d.count= +d.count
-						d.origin_dest = d.origin + "-" + d.dest;
-					});
-
-					//Create filtered datasets based on user input
-					dataset = dataset.filter(d=>d.carrier_name==airline_name_test
-																			& d.fl_year==input_year);*/
-
 
 					dataset.forEach(function(d){
 						d.origin_lat = +d.origin_lat;
@@ -187,10 +192,14 @@
 						d.dest_lon= +d.dest_lon;
 					});
 
-					dataset = dataset.filter(d=>d.carrier_name==airline_name_test
-																			& d.fl_year=="2019");
-
-					testdata = dataset.slice(0,460);
+					if(input_origin == "All Origins"){
+						dataset = dataset.filter(d=>d.carrier_name==airline_name
+																				& d.fl_year==input_year);
+					} else{
+						dataset = dataset.filter(d=>d.carrier_name==airline_name
+																				& d.fl_year==input_year
+																				& d.origin==input_origin);
+					}
 
 					//X-padding
 			    var x_pad = 60;
@@ -200,50 +209,6 @@
 					//Width and height
 					var w = 1100;
 					var h = 600;
-
-
-					//Create SVG element
-					/*var svg = d3.select("body")
-								.append("svg")
-								.attr("width", w)
-								.attr("height", h);
-
-
-					var projection = d3.geoAlbersUsa()
-															.translate([w/2,h/2])
-															.scale([1300]);
-
-					var mapPath = d3.geoPath()
-						.projection(projection);
-
-
-					d3.json("us-states.json")
-					.then(function(json) {
-						svg.selectAll("path")
-							.data(json.features)
-							.enter()
-							.append("path")
-							.attr("d", mapPath)
-							.style("fill", airline_color);
-					});*/
-
-
-					svg.selectAll("circle")
-						.data(dataset)
-						.enter()
-						.append("circle")
-						.attr("cx", function(d){
-							return projection([d.origin_lon, d.origin_lat])[0];
-						})
-						.attr("cy", function(d){
-							return projection([d.origin_lon, d.origin_lat])[1];
-						})
-						.attr("r",5)
-						.style("fill", "whitesmoke")
-						.style("stroke", "black")
-						.style("stroke-width", 0.25);
-						//.style("opacity", 0.75);
-
 
 					svg.selectAll("circle")
 						.data(dataset)
@@ -262,49 +227,75 @@
 
 						//Define line generator
 						line = d3.line()
-									.x(function(d) { return projection([d.origin_lon, d.origin_lat])[0]; })
-									.y(function(d) { return projection([d.origin_lon, d.origin_lat])[1]; });
+									.x(function(d) { return projection([d.lon, d.lat])[0]; })
+									.y(function(d) { return projection([d.lon, d.lat])[1]; });
 
+						dataset.forEach(function(d){
+							line_data = [{lon: d.origin_lon, lat: d.origin_lat},
+													 {lon: d.dest_lon, lat: d.dest_lat}];
 
-						dataset1 = dataset.slice(0,5);
+							lineAdd = svg.append("path")
+								.datum(line_data)
+								.attr("clip-path", "url(#clip)")
+								.attr("class", "line")
+								.attr("stroke", "whitesmoke")
+								.attr("stroke-width", "2px")
+								.attr("fill", "whitesmoke")
+								.attr("d", line);
+						});
 
-						line1Add = svg.append("path")
-							.datum(dataset1)
-							.attr("clip-path", "url(#clip)")
-							.attr("class", "line")
-							.attr("stroke", "whitesmoke")
-							.attr("stroke-width", "2px")
-							.attr("fill", "whitesmoke")
-							.attr("d", line);
+				});
 
+				//Graphic of number of unique routes for each year for selected airline
+				d3.json(yearlyroutes_url)
+				.then(function(dataset_bar) {
 
-						svg.selectAll("path")
-							.attr("class", "map")
-							.style("fill", airline_color);
+					//Data type conversions
+					dataset_bar.forEach(function(d){
+						d.avg_dep_dly = +d.avg_dep_dly;
+						d.count= +d.count
+						d.origin_dest = d.origin + "-" + d.dest;
+					});
 
+					if(input_origin == "All Origins"){
+						dataset_bar = dataset_bar.filter(d=>d.carrier_name==airline_name
+																				& d.fl_year==input_year);
+					} else{
+						dataset_bar = dataset_bar.filter(d=>d.carrier_name==airline_name
+																				& d.fl_year==input_year
+																				& d.origin==input_origin);
+					};
 
-					/*
+					//X-padding
+			    var x_pad = 60;
+			    //Y-padding
+			    var y_pad = 40;
+
+					//Width and height
+					var w = 1100;
+					//var h = 600;
+					var h = dataset_bar.length * 35;
 
 					//Set the y-domain for the bar graph according to the y data range
-					var yDomainMinMargin = (d3.max(dataset, function(d){return d.count;}) - d3.min(dataset, function(d){return d.count;})) * 0.3
-					var yDomainMin = d3.min(dataset, function(d){return d.count;}) - yDomainMinMargin;
+					var yDomainMinMargin = (d3.max(dataset_bar, function(d){return d.count;}) - d3.min(dataset_bar, function(d){return d.count;})) * 0.3
+					var yDomainMin = d3.min(dataset_bar, function(d){return d.count;}) - yDomainMinMargin;
 
 					var xScaleNew = d3.scaleLinear()
 			            .domain([yDomainMin,
-													 d3.max(dataset, function(d){return d.count;})])
+													 d3.max(dataset_bar, function(d){return d.count;})])
 			            .range([0, w-x_pad]);
 
 					var yScaleNew = d3.scaleBand()
-									.domain(d3.range(dataset.length))
+									.domain(d3.range(dataset_bar.length))
 									.rangeRound([h, 0])
 									.paddingInner(0.05);
 
-					delayMax = d3.range(dataset.length);
-				  delayMin = d3.min(dataset, function(d){return d.count});
+					delayMax = d3.range(dataset_bar.length);
+				  delayMin = d3.min(dataset_bar, function(d){return d.count});
 
 					//Generate Y-axis
 					var yAxisScaleNew = d3.scaleBand()
-			        .domain(dataset.map(function(d){return d.origin_dest;}))
+			        .domain(dataset_bar.map(function(d){return d.origin_dest;}))
 			        .rangeRound([h,0]);
 
 			    var yAxis = d3.axisLeft(yAxisScaleNew);
@@ -313,11 +304,11 @@
 					var svg = d3.select("body")
 								.append("svg")
 								.attr("width", w)
-								.attr("height", h);
+								.attr("height", h + 300);
 
 					//Create bars
 					svg.selectAll("rect")
-						 .data(dataset)
+						 .data(dataset_bar)
 						 .enter()
 						 .append("rect")
 						 .attr("x", function(d) {
@@ -340,7 +331,7 @@
 
 							//Get this bar's x/y values, then augment for the tooltip
 							var xPosition = parseFloat(d3.select(this).attr("x")) + xScaleNew(d.count) / 2;
-							var yPosition = parseFloat(d3.select(this).attr("y")) + yScaleNew.bandwidth() / 2;
+							var yPosition = parseFloat(d3.select(this).attr("y")) + (yScaleNew.bandwidth() / 2) + 600;
 
 							//Update the tooltip position and value
 							d3.select("#tooltip")
@@ -386,7 +377,7 @@
 
 				 //Add text values to each bar
 				 svg.selectAll("text")
-				 		.data(dataset)
+				 		.data(dataset_bar)
 						.enter()
 						.append("text")
 						.text(function(d){
@@ -405,11 +396,12 @@
  			    svg.append("g")
  			    .attr("class", "axis")
  			    .attr("transform","translate(" + x_pad + ",0)")
- 			    .call(yAxis);*/
+ 			    .call(yAxis);
 
-				});
+					});
+
+				return;
 				}
-
 
 
 
