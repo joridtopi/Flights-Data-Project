@@ -49,6 +49,8 @@
 		<input type="number" id="inputYear" min="1987" max="2019" step="1" value = "2019"/>
 		Select Origin:
 		<input type="text" id="inputOrigin" value = "All Origins"/>
+		<label>Min Flight Count: </label>
+		<input type="text" id="inputFlightCount" value = "10"/>
 		<label>Rank Route By: </label>
 		<select id="rankSel">
 		<option value="routeCount">Route Count</option>
@@ -87,14 +89,15 @@
 
 		<script type="text/javascript">
 
-			//Declare user input variables to updated by the fetch function
+			//Declare global user input variables to be updated by the fetch function
 			var airline_name = [];
 			var input_origin = [];
 			var input_year = [];
 			var input_rank = [];
 			var airline_color = [];
+			var input_flight_count = [];
 
-			//Declare Map SVG properties
+			//Declare global Map SVG properties
 			var svgMap = [];
 			var projection = [];
 			var mapPath = [];
@@ -128,13 +131,14 @@
 				},1000);
 			}
 
-			//Updates user inputs
+			//Updates user input globals based on current selections
 			function fetchUserInputs(){
 				//Fetch user inputs
 				airline_name = document.querySelector('input[name=airline]:checked').value;
 				input_origin = document.getElementById('inputOrigin').value;
 				input_year = document.getElementById('inputYear').value;
 				input_rank = document.getElementById('rankSel').value;
+				input_flight_count = +document.getElementById('inputFlightCount').value;
 
 				//Fetch airline color based on user input
 				if(airline_name == "Alaska Airlines Inc."){
@@ -168,18 +172,36 @@
 
 			//Obtains the geo data based on selected airline, populates global
 			function getGeoData(airline){
+
+				//URL for geo data API
 				const yearlyroutes_geo_url = 'http://localhost:3000/yearlyroutes/geo/airline/'+airline;
 
+				//Data conversions
 				d3.json(yearlyroutes_geo_url)
 				.then(function(dataset) {
 
+					//Convert strings to numericals
 					dataset.forEach(function(d){
 						d.origin_lat = +d.origin_lat;
 						d.origin_lon= +d.origin_lon;
 						d.dest_lat = +d.dest_lat;
 						d.dest_lon= +d.dest_lon;
+						d.avg_dep_dly = +d.avg_dep_dly;
+						d.count= +d.count
 					});
 
+
+					//Filter data based on user inputs. Filter or origin if input is not "All Origins"
+					if(input_origin == "All Origins"){
+						dataset = dataset.filter(d=>d.fl_year==input_year
+																				&d.count >= input_flight_count);
+					} else{
+						dataset = dataset.filter(d=>d.fl_year==input_year
+																				&d.count >= input_flight_count
+																				&d.origin==input_origin);
+					};
+
+				//Populate global with post processed data
 				geoData = dataset;
 				});
 			}
@@ -188,27 +210,33 @@
 			//Obtains route data sorted by count
 			function getRouteDataCount(airline){
 
+				//URL for flight count data API
 				const	yearlyroutes_url = 'http://localhost:3000/yearlyroutes/count/airline/'+airline;
 
+				//Data conversions
 				d3.json(yearlyroutes_url)
 				.then(function(dataset) {
 
-					//Data type conversions
+					//Convert strings to numericals and construct origin to dest string for y-axes
 					dataset.forEach(function(d){
 						d.avg_dep_dly = +d.avg_dep_dly;
 						d.count= +d.count
 						d.origin_dest = d.origin + "-" + d.dest;
 					});
 
+					//Filter data based on user inputs. Filter or origin if input is not "All Origins"
 					if(input_origin == "All Origins"){
 						dataset = dataset.filter(d=>d.carrier_name==airline_name
-																				& d.fl_year==input_year);
+																				& d.fl_year==input_year
+																				& d.count >= input_flight_count);
 					} else{
 						dataset = dataset.filter(d=>d.carrier_name==airline_name
 																				& d.fl_year==input_year
+																				& d.count >= input_flight_count
 																				& d.origin==input_origin);
 					};
 
+				//Populate global with post processed data
 				routeDataCount = dataset;
 				});
 			}
@@ -217,49 +245,48 @@
 			//Obtains route data sorted by average delay
 			function getRouteDataDelay(airline){
 
+				//URL for average flight delay data API
 				const yearlyroutes_url = 'http://localhost:3000/yearlyroutes/airline/'+airline;
 
+				//Data conversions
 				d3.json(yearlyroutes_url)
 				.then(function(dataset) {
 
-					//Data type conversions
+					//Convert strings to numericals and construct origin to dest string for y-axes
 					dataset.forEach(function(d){
 						d.avg_dep_dly = +d.avg_dep_dly;
-						d.count= +d.count
+						d.count= +d.count;
 						d.origin_dest = d.origin + "-" + d.dest;
 					});
 
+					//Filter data based on user inputs. Filter or origin if input is not "All Origins"
 					if(input_origin == "All Origins"){
 						dataset = dataset.filter(d=>d.carrier_name==airline_name
+																				& d.count >= input_flight_count
 																				& d.fl_year==input_year);
 					} else{
 						dataset = dataset.filter(d=>d.carrier_name==airline_name
 																				& d.fl_year==input_year
+																				& d.count >= input_flight_count
 																				& d.origin==input_origin);
 					};
 
+				//Populate global with post processed data
 				routeDataDelay = dataset;
 				});
 			}
 
-
-
-			//Clears all SVGs
+			//Clears all SVGs to refresh the charts
 			function refreshCharts(){
 				d3.selectAll("svg").remove();
 			}
 
 			//Creates the map svg
 			function createMap(){
-				//X-padding
-				var x_pad = 60;
-				//Y-padding
-				var y_pad = 40;
 
-				//Width and height
-				var w = 1100;
-				var h = 600;
-
+				//Width and height for map SVG
+				var w = 1250;
+				var h = 650;
 
 				//Create SVG element
 				svgMap = d3.select("body")
@@ -268,19 +295,22 @@
 							.attr("height", h)
 							.style("fill", "cornflowerblue");
 
+				//Create a colored background for the SVG
 				svgMap.append("rect")
 			    .attr("width", "100%")
 			    .attr("height", "100%")
 			    .attr("fill", "gainsboro");
 
+				//Declare the map projection
 				projection = d3.geoAlbersUsa()
 														.translate([w/2,h/2])
 														.scale([1300]);
 
+				//Create geo line paths based on selected projection
 				mapPath = d3.geoPath()
 					.projection(projection);
 
-
+				//Append the map paths to the SVG
 				d3.json("us-states.json")
 				.then(function(json) {
 					svgMap.selectAll("path")
@@ -294,15 +324,14 @@
 
 			}
 
-
-
-
-			//Creates circles based on geo data input
+			//Creates destination location circles based on geo data
 			function getCircles(dataset){
 
+				//If all origins are selected, then do not add origin filter. All circle sizes are the same.
+				//If an origin is selected, filter by it. Re-size circles based on flight count or flight delay.
+				//If an origin is selected, add a tooltip to the circle for more hover information
 				if(input_origin == "All Origins"){
-					dataset = dataset.filter(d=>d.fl_year==input_year);
-
+					//Add circles with the same size and no tooltip
 					svgMap.selectAll("circle")
 						.data(dataset)
 						.enter()
@@ -318,9 +347,19 @@
 						.style("stroke", "black")
 						.style("stroke-width", 0.25);
 				} else{
-					dataset = dataset.filter(d=>d.fl_year==input_year
-																			& d.origin==input_origin);
+					//Circle size scale for flight count
+					var circleScaleCount = d3.scaleLinear()
+			            .domain([d3.min(dataset, function(d){return d.count;}),
+													 d3.max(dataset, function(d){return d.count;})])
+			            .range([2, 15]);
 
+					//Circle size scale for average flight delay
+					var circleScaleDelay = d3.scaleLinear()
+			            .domain([d3.min(dataset, function(d){return d.avg_dep_dly;}),
+													 d3.max(dataset, function(d){return d.avg_dep_dly;})])
+			            .range([2, 15]);
+
+					//Add circles with varying size and tooltip on hover
 					svgMap.selectAll("circle")
 						.data(dataset)
 						.enter()
@@ -331,7 +370,13 @@
 						.attr("cy", function(d){
 							return projection([d.dest_lon, d.dest_lat])[1];
 						})
-						.attr("r",5)
+						.attr("r", function(d){
+							if(input_rank == "routeCount"){
+								return circleScaleCount(d.count);
+							} else if (input_rank == "routeDelay"){
+								return circleScaleDelay(d.avg_dep_dly);
+							};
+						})
 						.style("fill", "whitesmoke")
 						.style("stroke", "black")
 						.style("stroke-width", 0.25)
@@ -390,22 +435,19 @@
 
 			//Creates flight paths based on geo data input
 			function getFlightPaths(dataset){
-				if(input_origin == "All Origins"){
-					dataset = dataset.filter(d=>d.fl_year==input_year)
-				}else{
-					dataset = dataset.filter(d=>d.fl_year==input_year
-																			& d.origin==input_origin);
-				}
 
-				//Define line generator
+				//Define line generator using the geo projection
 				line = d3.line()
 							.x(function(d) { return projection([d.lon, d.lat])[0]; })
 							.y(function(d) { return projection([d.lon, d.lat])[1]; });
 
+				//Create lines using a for loop on each route
 				dataset.forEach(function(d){
+					//For each data point, obtain origin and end points for the line
 					line_data = [{lon: d.origin_lon, lat: d.origin_lat},
 											 {lon: d.dest_lon, lat: d.dest_lat}];
 
+					//Add the generated line for each data point
 					lineAdd = svgMap.append("path")
 						.datum(line_data)
 						.attr("clip-path", "url(#clip)")
@@ -427,29 +469,26 @@
 			    var y_pad = 40;
 
 					//Width and height
-					var w = 1100;
-					//var h = 600;
+					var w = 1250;
 					var h = dataset_bar.length * 35;
-
 
 					//Set the y-domain for the bar graph according to the y data range
 					var yDomainMinMargin = (d3.max(dataset_bar, function(d){return d.count;}) - d3.min(dataset_bar, function(d){return d.count;})) * 0.3
 					var yDomainMin = d3.min(dataset_bar, function(d){return d.count;}) - yDomainMinMargin;
 
+					//Define the x-scale
 					var xScaleNew = d3.scaleLinear()
 			            .domain([yDomainMin,
 													 d3.max(dataset_bar, function(d){return d.count;})])
 			            .range([0, w-x_pad]);
 
+					//Define the y-scale
 					var yScaleNew = d3.scaleBand()
 									.domain(d3.range(dataset_bar.length))
 									.rangeRound([h, 0])
 									.paddingInner(0.05);
 
-					delayMax = d3.range(dataset_bar.length);
-				  delayMin = d3.min(dataset_bar, function(d){return d.count});
-
-					//Generate Y-axis
+					//Generate Y-axis and map origin-destination string
 					var yAxisScaleNew = d3.scaleBand()
 			        .domain(dataset_bar.map(function(d){return d.origin_dest;}))
 			        .rangeRound([h,0]);
@@ -548,7 +587,7 @@
 						.attr("font-family", "sans-serif")
 						.attr("fill", "whitesmoke");
 
- 			   //Create y-axis
+ 			   //Add the y-axis
  			    svg.append("g")
  			    .attr("class", "axis")
  			    .attr("transform","translate(" + x_pad + ",0)")
@@ -566,29 +605,26 @@
 		    var y_pad = 40;
 
 				//Width and height
-				var w = 1100;
-				//var h = 600;
+				var w = 1250;
 				var h = dataset_bar.length * 35;
-
 
 				//Set the y-domain for the bar graph according to the y data range
 				var yDomainMinMargin = (d3.max(dataset_bar, function(d){return d.avg_dep_dly;}) - d3.min(dataset_bar, function(d){return d.avg_dep_dly;})) * 0.3
 				var yDomainMin = d3.min(dataset_bar, function(d){return d.avg_dep_dly;}) - yDomainMinMargin;
 
+				//Define the x-scale
 				var xScaleNew = d3.scaleLinear()
 								.domain([yDomainMin,
 												 d3.max(dataset_bar, function(d){return d.avg_dep_dly;})])
 								.range([0, w-x_pad]);
 
+				//Define the y-scale
 				var yScaleNew = d3.scaleBand()
 								.domain(d3.range(dataset_bar.length))
 								.rangeRound([h, 0])
 								.paddingInner(0.05);
 
-				delayMax = d3.range(dataset_bar.length);
-				delayMin = d3.min(dataset_bar, function(d){return d.avg_dep_dly});
-
-				//Generate Y-axis
+				//Generate Y-axis and map the origin-destination string to it
 				var yAxisScaleNew = d3.scaleBand()
 						.domain(dataset_bar.map(function(d){return d.origin_dest;}))
 						.rangeRound([h,0]);
