@@ -198,9 +198,6 @@ const getFlightRoutesGeo = (request, response) => {
   });
 }
 
-
-
-
 const getAircraftCount = (request, response) => {
   const id = request.params.id;
   const query = `
@@ -217,6 +214,39 @@ const getAircraftCount = (request, response) => {
   });
 }
 
+
+const getDailyAnalysis = (request, response) => {
+  const id1 = request.params.id1;
+  const id2 = request.params.id2;
+  const id3 = request.params.id3;
+  const query = `
+  SELECT origin,
+  		dest,
+  		fl_date,
+      EXTRACT(YEAR from fl_date) AS fl_year,
+  		EXTRACT(MONTH from fl_date) AS fl_month,
+  		EXTRACT(DAY from fl_date) AS fl_day,
+      dep_time,
+  		carrier_name,
+      origin.airport_name AS origin_airport_name,
+      dest.airport_name AS dest_airport_name,
+  		dep_delay
+  FROM flights_${id1}
+  LEFT JOIN carrier_lookup ON op_unique_carrier = code
+  JOIN airport_lookup AS origin ON flights_${id1}.origin = origin.code
+  JOIN airport_lookup AS dest ON flights_${id1}.dest = dest.code
+  WHERE fl_date = '${id2}' AND carrier_name = '${id3}' AND cancelled = '0'
+  ORDER BY dep_delay ASC;
+  `;
+  pool.query(query, (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  });
+}
+
+
 module.exports = {
   getFlightDelays,
   getFlightDelaysDaily,
@@ -225,7 +255,8 @@ module.exports = {
   getFlightRoutesCountAirline,
   getFlightRoutesGeoAirline,
   getFlightRoutesGeo,
-  getAircraftCount
+  getAircraftCount,
+  getDailyAnalysis
 }
 
 
