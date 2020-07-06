@@ -195,11 +195,11 @@
 					//Filter data based on user inputs. Filter or origin if input is not "All Origins"
 					if(input_origin == "All Origins"){
 						dataset = dataset.filter(d=>d.fl_year==input_year
-																				&d.carrier_name == airline
+																				&d.carrier_name == airline_name
 																				&d.count >= input_flight_count);
 					} else{
 						dataset = dataset.filter(d=>d.fl_year==input_year
-																				&d.carrier_name == airline
+																				&d.carrier_name == airline_name
 																				&d.count >= input_flight_count
 																				&d.origin==input_origin);
 					};
@@ -232,12 +232,10 @@
 					if(input_origin == "All Origins"){
 						dataset = dataset.filter(d=>d.carrier_name==airline_name
 																				& d.fl_year==input_year
-																				& d.carrier_name == airline
 																				& d.count >= input_flight_count);
 					} else{
 						dataset = dataset.filter(d=>d.carrier_name==airline_name
 																				& d.fl_year==input_year
-																				& d.carrier_name == airline
 																				& d.count >= input_flight_count
 																				& d.origin==input_origin);
 					};
@@ -252,7 +250,8 @@
 			function getRouteDataDelay(airline){
 
 				//URL for average flight delay data API
-				const yearlyroutes_url = 'http://localhost:3000/yearlyroutes/airline/'+airline;
+				//const yearlyroutes_url = 'http://localhost:3000/yearlyroutes/airline/'+airline;
+				const	yearlyroutes_url = 'JSON_data/flight_route_delay.json';
 
 				//Data conversions
 				d3.json(yearlyroutes_url)
