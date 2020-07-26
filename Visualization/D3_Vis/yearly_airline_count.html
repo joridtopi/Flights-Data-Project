@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Number of Routes Per Year</title>
+		<script type="text/javascript" src="d3.js"></script>
+		<style type="text/css">
+		p {
+			font-family: Helvetica, sans-serif;
+			font-size: 14px;
+			font-weight: bold;
+		}
+
+		input[type=checkbox] {
+			margin-left: 5px;
+		}
+
+		#tooltip {
+			position: absolute;
+			width: 200px;
+			height: auto;
+			padding: 10px;
+			background-color: white;
+			-webkit-border-radius: 10px;
+			-moz-border-radius: 10px;
+			border-radius: 10px;
+			-webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+			-moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+			box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+			pointer-events: none;
+		}
+
+		#tooltip.hidden {
+			display: none;
+		}
+
+		#tooltip p {
+			margin: 0;
+			font-family: sans-serif;
+			font-size: 16px;
+			line-height: 20px;
+		}
+
+		</style>
+	</head>
+	<body>
+
+
+		<div id="tooltip" class="hidden">
+			<p><strong>Number of Air Carriers</strong></p>
+			<p><span id="value">100</span></p>
+		</div>
+
+
+		<script type="text/javascript">
+
+			var testdata = [];
+
+
+
+			const yearlyroutes_url = '/JSON_data/yearly_airline_count.json';
+			//const yearlyroutes_url = 'http://localhost:3000/yearlyroutes/year';
+
+			//Graphic of number of unique routes for each year for selected airline
+			d3.json(yearlyroutes_url)
+			.then(function(dataset) {
+
+				dataset.forEach(function(d){
+					d.count = +d.count;
+				});
+
+
+				testdata.push(dataset);
+
+				//Width and height
+				var w = 1100;
+				var h = 600;
+
+				//X-padding
+		    var x_pad = 60;
+		    //Y-padding
+		    var y_pad = 40;
+
+				var xScale = d3.scaleBand()
+								.domain(d3.range(dataset.length))
+								.rangeRound([0, w-x_pad])
+								.paddingInner(0.05);
+
+				var yScale = d3.scaleLinear()
+								.domain([0, d3.max(dataset, function(d){return d.count;})])
+								.range([0, h-y_pad]);
+
+				var xAxisScale = d3.scaleBand()
+		        .domain(dataset.map(function(d){return d.fl_year;}))
+		        .rangeRound([0, w-x_pad]);
+
+		    var yAxisScale = d3.scaleLinear()
+		            .domain([0, d3.max(dataset, function(d){return d.count;})])
+		            .range([h-y_pad,0]);
+
+		    var xAxis = d3.axisBottom(xAxisScale);
+
+		    var yAxis = d3.axisLeft(yAxisScale);
+
+				//Create SVG element
+				var svg = d3.select("body")
+							.append("svg")
+							.attr("width", w)
+							.attr("height", h);
+
+				//Create bars
+				svg.selectAll("rect")
+					 .data(dataset)
+					 .enter()
+					 .append("rect")
+					 .attr("x", function(d, i) {
+							return xScale(i) + x_pad;
+					 })
+					 .attr("y", function(d) {
+							return h - yScale(d.count) - y_pad;
+					 })
+					 .attr("width", xScale.bandwidth())
+					 .attr("height", function(d) {
+							return yScale(d.count);
+					 })
+					 .attr("fill", "cornflowerblue")
+					 .attr("stroke", "whitesmoke")
+					 .on("mouseover", function(d){
+						 d3.select(this)
+						 	.attr("fill", "whitesmoke")
+							.attr("stroke", "cornflowerblue");
+
+						//Get this bar's x/y values, then augment for the tooltip
+						var xPosition = parseFloat(d3.select(this).attr("x")) + xScale.bandwidth() / 2;
+						var yPosition = parseFloat(d3.select(this).attr("y")) / 2 + h / 2;
+
+						//Update the tooltip position and value
+						d3.select("#tooltip")
+							.style("left", xPosition + "px")
+							.style("top", yPosition + "px")
+							.select("#value")
+							.text(d.count);
+
+						//Show the tooltip
+						d3.select("#tooltip").classed("hidden", false);
+
+					 })
+					 .on("mouseout", function(d){
+						 d3.select(this)
+						 	.transition()
+							.duration(250)
+						 	.attr("fill", "cornflowerblue")
+							.attr("stroke", "whitesmoke");
+
+						//Hide the tooltip
+						d3.select("#tooltip").classed("hidden", true);
+
+					 });
+
+		 		//Create x-axis
+	      svg.append("g")
+	      .attr("class", "axis")
+	      .attr("transform","translate(" + x_pad + "," + (h-y_pad) + ")")
+	        .call(xAxis)
+	      .selectAll("text")
+	      .style("text-anchor", "end")
+	      .attr("dx", "-.8em")
+	      .attr("dy", ".15em")
+	      .attr("transform", "rotate(-65)");
+
+			   //Create y-axis
+			    svg.append("g")
+			    .attr("class", "axis")
+			    .attr("transform","translate(" + x_pad + ",0)")
+			    .call(yAxis);
+
+				});
+
+		</script>
+	</body>
+</html>
