@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>D3: Pie layout pie chart</title>
+		<title> </title>
 		<script type="text/javascript" src="../d3.js"></script>
 		<style type="text/css">
 
@@ -42,8 +42,16 @@
 	</head>
 	<body>
 		<p>
-		Select Year:
+			<b>Description:</b> <br>This chart displays the proportion of total yearly flights for each recorded carrier on the selected year in a pie format.
+		<br><br>
+			<b>Guide:</b> <br>Select any year between 1987 and 2019, then click on the "Get Chart" button to obtain the graphic.
+		<br><br>
+			<b>Features:</b> <br>Hover over any wedge of the pie to obtain more details on that observation.
+		<br><br>
+		<b>User Inputs:</b>
+		<br>Select Year:
 		<input type="number" id="inputYear" min="1987" max="2019" step="1" value = "2019"/>
+		<button>Get Chart</button>
 		</p>
 
 		<div id="tooltip" class="hidden">
@@ -53,6 +61,8 @@
 			<p><span id="propDisp">100</span></p>
 			<p><strong>Number of Flights:</strong></p>
 			<p><span id="countDisp">100</span></p>
+			<p><strong>Year:</strong></p>
+			<p><span id="yearDisp">100</span></p>
 		</div>
 
 		<script type="text/javascript">
@@ -81,8 +91,8 @@
 			const airline_flight_count_data = '/JSON_data/yearly_airline_flight_count.json';
 
 			//Create event to listen for user input clicks to update data
-			d3.selectAll('input')
-				.on("change", updateCharts);
+			d3.selectAll('button')
+				.on("click", updateCharts);
 
 
 			function updateCharts(){
@@ -155,6 +165,10 @@
 										d3.select("#tooltip")
 											.select("#propDisp")
 											.text(d.carrier_prop+"%");
+
+										d3.select("#tooltip")
+											.select("#yearDisp")
+											.text(input_year);
 
 										//Show the tooltip
 										d3.select("#tooltip").classed("hidden", false);
