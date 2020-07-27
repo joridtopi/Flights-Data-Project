@@ -8,7 +8,6 @@
 			p {
 				font-family: Helvetica, sans-serif;
 				font-size: 14px;
-				font-weight: bold;
 			}
 
 			input[type=checkbox] {
@@ -17,7 +16,13 @@
 		</style>
 	</head>
 	<body>
-
+		<p>
+			<p>
+				<b>Description:</b> <br>This chart displays a time series of the total recorded daily flight count from the year 1987 to 2019.
+			<br><br>
+				<b>Features:</b> <br>Zoom in on the time scale using mouse scroller or touchpad. Drag the line along the time scale. Refresh page to obtain the original scale.
+			<br><br>
+		</p>
 
 		<script type="text/javascript">
 
@@ -25,9 +30,8 @@
 			var inputsel = [];
 
 
-			//Obtain input data from database
-			//const depdelays_url = 'http://localhost:3000/depdelays/daily';
-			const depdelays_url = 'JSON_data/number_daily_flights.json';
+			//Path to data input
+			const daily_flight_count_data = 'JSON_data/number_daily_flights.json';
 
 			//Global variable of the dataset
 			var datasetGlobal = [];
@@ -55,7 +59,6 @@
 			//Declare variables globally for adding lines
 			var line1Add = [];
 
-
 			//Create zoom behavior
 			var zoom = d3.zoom()
 				.on("zoom", updateChart);
@@ -76,12 +79,8 @@
 					.attr("width", w)
 					.attr("height", h-y_pad);
 
-			//Create event to listen for user input clicks to update data
-			//d3.selectAll('input')
-				//.on("click", getData);
-
-			//Update the input data
-			d3.json(depdelays_url)
+			//Obtain chart using input data
+			d3.json(daily_flight_count_data)
 			.then(function(dataset) {
 
 				//Convert input data to appropriate data types
@@ -90,9 +89,10 @@
 					d.fl_date = new Date(String(d.fl_date));
 				});
 
+				//Assign the post-processed dataset to the global
 				datasetGlobal = dataset;
 
-				//Create scale functions based on filtered data
+				//Create scale functions based on post-processed data
 				xScale = d3.scaleTime()
 						   .domain([
 								d3.min(datasetGlobal, function(d) { return d.fl_date; }),
@@ -105,7 +105,7 @@
 											 d3.max(datasetGlobal, function(d) { return d.count; })])
 							.range([h - y_pad, 0]);
 
-				//Create axes based on X and Y scales
+				//Create axes based on X and Y scale functions
 				xAxis = d3.axisBottom(xScale);
 				yAxis = d3.axisLeft(yScale);
 
@@ -114,7 +114,7 @@
 							.x(function(d) { return xScale(d.fl_date) + x_pad; })
 							.y(function(d) { return yScale(d.count); });
 
-				//Remove any previous axes for a refresh property
+				//Remove any previous axes for refresh
 				d3.selectAll("g.axis").remove();
 
 				//Add the x-axis
@@ -132,7 +132,7 @@
 				//Remove any previous lines as a refresh
 				d3.selectAll("path.line").remove();
 
-				//Create a line of filtered data based on each user input
+				//Add the line to the chart
 				line1Add = svg.append("path")
 					.datum(datasetGlobal)
 					.attr("clip-path", "url(#clip)")
@@ -143,6 +143,7 @@
 					.attr("d", line);
 				});
 
+				//Add zoom behavior to svg
 				svg.call(zoom.transform, d3.zoomIdentity);
 
 
@@ -175,9 +176,8 @@
 							.x(function(d) { return xScaleNew(d.fl_date); })
 							.y(function(d) { return yScaleNew(d.count); });
 
-				//Update each line with the new line path
+				//Update line with the new line path
 				line1Add.attr("d", newLine);
-
 			};
 
 
