@@ -75,6 +75,43 @@
 		<label for="airline8" style="color:gold"> Spirit Airlines</label>
 		<input type="radio" id="input9" name="airline" value="United Air Lines Inc.">
 		<label for="airline9" style="color:cornflowerblue"> United Airlines</label>
+		<input type="radio" id="input10" name="airline" value="SkyWest Airlines Inc.">
+		<label for="airline10" style="color:cornflowerblue"> SkyWest Airlines</label>
+
+		<select id="sel">
+			<option value="AirTran Airways Corporation">AirTran Airways Corporation</option>
+			<option value="Alaska Airlines">Alaska Airlines</option>
+			<option value="Allegiant Air">Allegiant Air</option>
+			<option value="Aloha Air Cargo">Aloha Air Cargo</option>
+			<option value="America West Airlines">America West Airlines</option>
+			<option value="American Airlines">American Airlines</option>
+			<option value="ATA Airlines">ATA Airlines</option>
+			<option value="Continental Airlines">Continental Airlines</option>
+			<option value="Delta Airlines">Delta Airlines</option>
+			<option value="Eastern Airlines">Eastern Airlines</option>
+			<option value="Endeavor Air">Endeavor Air</option>
+			<option value="Envoy Air">Envoy Air</option>
+			<option value="ExpressJet Airlines">ExpressJet Airlines</option>
+			<option value="Frontier Airlines">Frontier Airlines</option>
+			<option value="Hawaiian Airlines">Hawaiian Airlines</option>
+			<option value="Independence Air">Independence Air</option>
+			<option value="JetBlue Airways">JetBlue Airways</option>
+			<option value="Mesa Airlines">Mesa Airlines</option>
+			<option value="Midway Airlines">Midway Airlines</option>
+			<option value="Northwest Airlines">Northwest Airlines</option>
+			<option value="Pacific Southwest Airlines">Pacific Southwest Airlines</option>
+			<option value="Pan American World Airways">Pan American World Airways</option>
+			<option value="Piedmont Aviation">Piedmont Aviation</option>
+			<option value="PSA Airlines">PSA Airlines</option>
+			<option value="Republic Airline">Republic Airline</option>
+			<option value="SkyWest Airlines">SkyWest Airlines</option>
+			<option value="Southwest Airlines">Southwest Airlines</option>
+			<option value="Spirit Airlines">Spirit Airlines</option>
+			<option value="Trans World Airways">Trans World Airways</option>
+			<option value="United Airlines">United Airlines</option>
+			<option value="US Airways">US Airways</option>
+			<option value="Virgin America">Virgin America</option>
+		</select>
 		</p>
 
 		<div id="tooltip" class="hidden">
@@ -88,6 +125,7 @@
 
 
 		<script type="text/javascript">
+
 
 			//Declare global user input variables to be updated by the fetch function
 			var airline_name = [];
@@ -166,6 +204,9 @@
 					airline_color = "gold";
 				}
 				else if(airline_name == "United Air Lines Inc."){
+					airline_color = "cornflowerblue";
+				}
+				else if(airline_name == "SkyWest Airlines Inc."){
 					airline_color = "cornflowerblue";
 				};
 			}

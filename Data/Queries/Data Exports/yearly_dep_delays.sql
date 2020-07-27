@@ -11,4 +11,4 @@ WHERE carrier_name = 'Alaska Airlines Inc.' OR
       carrier_name = 'Spirit Air Lines' OR
       carrier_name = 'United Air Lines Inc.'
 ORDER BY fl_year ASC) yearly_delay_data
-) TO 'path/daily_dep_delay.json'
+) TO 'path/yearly_dep_delay.json'

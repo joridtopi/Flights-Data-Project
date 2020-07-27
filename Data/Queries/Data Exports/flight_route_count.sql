@@ -20,4 +20,4 @@ COPY (SELECT row_to_json(flight_route_count_data) FROM
       carrier_name = 'Spirit Air Lines' OR
       carrier_name = 'United Air Lines Inc.'
 ORDER BY count ASC) flight_route_count_data
-) TO 'path/daily_dep_delay.json'
+) TO 'path/flight_route_count.json'

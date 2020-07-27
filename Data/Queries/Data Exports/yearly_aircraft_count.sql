@@ -12,4 +12,4 @@ WHERE fl_year > 1994 AND
       carrier_name = 'Spirit Air Lines' OR
       carrier_name = 'United Air Lines Inc.')
 ORDER BY fl_year ASC) yearly_ac_data
-) TO 'path/daily_dep_delay.json'
+) TO 'path/yearly_aircraft_count.json'
