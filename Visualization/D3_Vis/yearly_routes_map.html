@@ -45,40 +45,9 @@
 	</head>
 	<body>
 		<p>
-		Select Year:
-		<input type="number" id="inputYear" min="1987" max="2019" step="1" value = "2019"/>
-		Select Origin:
-		<input type="text" id="inputOrigin" value = "All Origins"/>
-		<label>Min Flight Count: </label>
-		<input type="text" id="inputFlightCount" value = "10"/>
-		<label>Rank Route By: </label>
-		<select id="rankSel">
-		<option value="routeCount">Route Count</option>
-		<option value="routeDelay">Average Route Delay</option>
-		</select>
-		<br>
-		<input type="radio" id="input1" name="airline" value="Alaska Airlines">
-		<label for="airline1" style="color:seagreen"> Alaska Airlines</label>
-		<input type="radio" id="input2" name="airline" value="American Airlines">
-		<label for="airline2" style="color:slategray"> American Airlines</label>
-		<input type="radio" id="input3" name="airline" value="Delta Airlines">
-		<label for="airline3" style="color:darkred"> Delta Airlines</label>
-		<input type="radio" id="input4" name="airline" value="Frontier Airlines">
-		<label for="airline4" style="color:yellowgreen"> Frontier Airlines</label>
-		<input type="radio" id="input5" name="airline" value="Hawaiian Airlines">
-		<label for="airline5" style="color:orchid"> Hawaiian Airlines</label>
-		<input type="radio" id="input6" name="airline" value="JetBlue Airways">
-		<label for="airline6" style="color:skyblue"> JetBlue Airways</label>
-		<input type="radio" id="input7" name="airline" value="Southwest Airlines">
-		<label for="airline7" style="color:indigo"> Southwest Airlines</label>
-		<input type="radio" id="input8" name="airline" value="Spirit Airlines">
-		<label for="airline8" style="color:gold"> Spirit Airlines</label>
-		<input type="radio" id="input9" name="airline" value="United Airlines">
-		<label for="airline9" style="color:cornflowerblue"> United Airlines</label>
-		<input type="radio" id="input10" name="airline" value="SkyWest Airlines">
-		<label for="airline10" style="color:cornflowerblue"> SkyWest Airlines</label>
 
-		<select id="sel">
+		Select Air Carrier:
+		<select id="airline_sel">
 			<option value="AirTran Airways Corporation">AirTran Airways Corporation</option>
 			<option value="Alaska Airlines">Alaska Airlines</option>
 			<option value="Allegiant Air">Allegiant Air</option>
@@ -112,6 +81,19 @@
 			<option value="US Airways">US Airways</option>
 			<option value="Virgin America">Virgin America</option>
 		</select>
+		<br>Select Year:
+		<input type="number" id="inputYear" min="1987" max="2019" step="1" value = "2019"/>
+		<br>Select Origin:
+		<input type="text" id="inputOrigin" value = "All Origins"/>
+		<br><label>Min Flight Count: </label>
+		<input type="text" id="inputFlightCount" value = "10"/>
+		<br><label>Rank Route By: </label>
+		<select id="rankSel">
+		<option value="routeCount">Route Count</option>
+		<option value="routeDelay">Average Route Delay</option>
+		</select>
+		<br>
+		<button>Get Chart</button>
 		</p>
 
 		<div id="tooltip" class="hidden">
@@ -147,8 +129,8 @@
 
 
 			//Create event to listen for user input clicks to update data
-			d3.selectAll('input')
-				.on("change", updateCharts);
+			d3.selectAll('button')
+				.on("click", updateCharts);
 
 			//Flow control function for building charts
 			function updateCharts(){
@@ -166,13 +148,14 @@
 					} else if (input_rank == "routeDelay"){
 						routeDelayBarChart(routeDataDelay);
 					};
-				},1000);
+				},2500);
 			}
 
 			//Updates user input globals based on current selections
 			function fetchUserInputs(){
-				//Fetch user inputs
-				airline_name = document.querySelector('input[name=airline]:checked').value;
+
+				airline_name = document.getElementById("airline_sel");
+				airline_name = airline_name.options[airline_name.selectedIndex].value;
 				input_origin = document.getElementById('inputOrigin').value;
 				input_year = document.getElementById('inputYear').value;
 				input_rank = document.getElementById('rankSel').value;
@@ -208,6 +191,9 @@
 				}
 				else if(airline_name == "SkyWest Airlines"){
 					airline_color = "cornflowerblue";
+				}
+				else{
+					airline_color = "darkslategrey";
 				};
 			}
 
