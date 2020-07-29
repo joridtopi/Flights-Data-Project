@@ -5,10 +5,10 @@
 		<title>Number of Routes Per Year</title>
 		<script type="text/javascript" src="d3.js"></script>
 		<style type="text/css">
+
 		p {
 			font-family: Helvetica, sans-serif;
 			font-size: 14px;
-			font-weight: bold;
 		}
 
 		input[type=checkbox] {
@@ -44,11 +44,18 @@
 		</style>
 	</head>
 	<body>
-		<p>
-
-		Select Air Carrier:
+		<p style="width: 1250px;">
+		<b>Description:</b> <br>This chart displays a route map for a selected airline, year, minimum flight count, and origin. A ranking of each route is displayed below the map either by flight count or average departure delay, as selected by the user.
+		<br><br>
+		<b>Guide:</b> <br>Select an air carrier from the drop down list. The list contains every air carrier that has a recorded domestic flight between the years 1987 and 2019. Select any year between 1987 and 2019. Enter an origin airport using a 3-letter airport code in all caps or enter "All Origins" to filter on the departure airport. Enter a minimum route count, which filters out routes that were flown less than this threshold. Select the route rank criteria for the route ranking below the map. Ranking by route count will rank the filtered routes from the most to least frequently flown. Ranking by average delay will rank the filtered routes from the longest average departure delay in minutes to the shortest.
+		<br><br>Click the "Get Chart" button and wait a few seconds for the data to load and the charts to update.
+		<br><br>
+		<b>Features:</b> <br>Hover over any bar in the bar chart below the map to obtain more details about that route. If filtering on an origin, hover on any destination bubble on the map for more details on that route.
+		<br><br>
+		<b>User Inputs:</b>
+		<br>Select Air Carrier:
 		<select id="airline_sel">
-			<option value="AirTran Airways Corporation">AirTran Airways Corporation</option>
+			<option value="AirTran Airways Corporation">AirTran Airways</option>
 			<option value="Alaska Airlines">Alaska Airlines</option>
 			<option value="Allegiant Air">Allegiant Air</option>
 			<option value="Aloha Air Cargo">Aloha Air Cargo</option>
@@ -126,6 +133,9 @@
 			var geoData = [];
 			var routeDataCount = [];
 			var routeDataDelay = [];
+
+			//Length of description text paragraph for hover tooltip offset
+			var textParLength = 130;
 
 
 			//Create event to listen for user input clicks to update data
@@ -419,7 +429,7 @@
 
 						 //Get this bar's x/y values, then augment for the tooltip
 						 var xPosition = parseFloat(d3.select(this).attr("cx")) + 20;
-						 var yPosition = parseFloat(d3.select(this).attr("cy"));
+						 var yPosition = parseFloat(d3.select(this).attr("cy")) + textParLength;
 
 						 //Update the tooltip position and value
 						 d3.select("#tooltip")
@@ -558,7 +568,7 @@
 
 							//Get this bar's x/y values, then augment for the tooltip
 							var xPosition = parseFloat(d3.select(this).attr("x")) + xScaleNew(d.count) / 2;
-							var yPosition = parseFloat(d3.select(this).attr("y")) + (yScaleNew.bandwidth() / 2) + 600;
+							var yPosition = parseFloat(d3.select(this).attr("y")) + (yScaleNew.bandwidth() / 2) + 600 + textParLength;
 
 							//Update the tooltip position and value
 							d3.select("#tooltip")
@@ -694,7 +704,7 @@
 
 						//Get this bar's x/y values, then augment for the tooltip
 						var xPosition = parseFloat(d3.select(this).attr("x")) + xScaleNew(d.avg_dep_dly) / 2;
-						var yPosition = parseFloat(d3.select(this).attr("y")) + (yScaleNew.bandwidth() / 2) + 600;
+						var yPosition = parseFloat(d3.select(this).attr("y")) + (yScaleNew.bandwidth() / 2) + 600 + textParLength;
 
 						//Update the tooltip position and value
 						d3.select("#tooltip")
