@@ -8,7 +8,6 @@
 		p {
 			font-family: Helvetica, sans-serif;
 			font-size: 14px;
-			font-weight: bold;
 		}
 
 		input[type=checkbox] {
@@ -44,25 +43,51 @@
 		</style>
 	</head>
 	<body>
-		<p>
-		<input type="radio" id="input1" name="airline" value="Alaska Airlines">
-		<label for="airline1" style="color:seagreen"> Alaska Airlines</label>
-		<input type="radio" id="input2" name="airline" value="American Airlines">
-		<label for="airline2" style="color:slategray"> American Airlines</label>
-		<input type="radio" id="input3" name="airline" value="Delta Airlines">
-		<label for="airline3" style="color:darkred"> Delta Airlines</label>
-		<input type="radio" id="input4" name="airline" value="Frontier Airlines">
-		<label for="airline4" style="color:yellowgreen"> Frontier Airlines</label>
-		<input type="radio" id="input5" name="airline" value="Hawaiian Airlines">
-		<label for="airline5" style="color:orchid"> Hawaiian Airlines</label>
-		<input type="radio" id="input6" name="airline" value="JetBlue Airways">
-		<label for="airline6" style="color:skyblue"> JetBlue Airways</label>
-		<input type="radio" id="input7" name="airline" value="Southwest Airlines">
-		<label for="airline7" style="color:indigo"> Southwest Airlines</label>
-		<input type="radio" id="input8" name="airline" value="Spirit Airlines">
-		<label for="airline8" style="color:gold"> Spirit Airlines</label>
-		<input type="radio" id="input9" name="airline" value="United Airlines">
-		<label for="airline9" style="color:cornflowerblue"> United Airlines</label>
+		<p style="width: 1200px;">
+		<b>Description:</b> <br>This chart displays a bar graph of the average yearly delay in minutes for a selected air carrier.
+		<br><br>
+		<b>Guide:</b> <br>Select an air carrier from the drop down list. The list contains every air carrier that has a recorded domestic flight between the years 1987 and 2019. Click the "Get Chart" button to update the graph.
+		<br><br>
+		<b>Features:</b> <br>Hover over any bar in the chart to obtain more details about that observation.
+		<br><br>
+		<b>User Inputs:</b>
+		<br>Select Air Carrier:
+		<select id="airline_sel">
+			<option value="AirTran Airways Corporation">AirTran Airways</option>
+			<option value="Alaska Airlines">Alaska Airlines</option>
+			<option value="Allegiant Air">Allegiant Air</option>
+			<option value="Aloha Air Cargo">Aloha Air Cargo</option>
+			<option value="America West Airlines">America West Airlines</option>
+			<option value="American Airlines">American Airlines</option>
+			<option value="ATA Airlines">ATA Airlines</option>
+			<option value="Continental Airlines">Continental Airlines</option>
+			<option value="Delta Airlines">Delta Airlines</option>
+			<option value="Eastern Airlines">Eastern Airlines</option>
+			<option value="Endeavor Air">Endeavor Air</option>
+			<option value="Envoy Air">Envoy Air</option>
+			<option value="ExpressJet Airlines">ExpressJet Airlines</option>
+			<option value="Frontier Airlines">Frontier Airlines</option>
+			<option value="Hawaiian Airlines">Hawaiian Airlines</option>
+			<option value="Independence Air">Independence Air</option>
+			<option value="JetBlue Airways">JetBlue Airways</option>
+			<option value="Mesa Airlines">Mesa Airlines</option>
+			<option value="Midway Airlines">Midway Airlines</option>
+			<option value="Northwest Airlines">Northwest Airlines</option>
+			<option value="Pacific Southwest Airlines">Pacific Southwest Airlines</option>
+			<option value="Pan American World Airways">Pan American World Airways</option>
+			<option value="Piedmont Aviation">Piedmont Aviation</option>
+			<option value="PSA Airlines">PSA Airlines</option>
+			<option value="Republic Airline">Republic Airline</option>
+			<option value="SkyWest Airlines">SkyWest Airlines</option>
+			<option value="Southwest Airlines">Southwest Airlines</option>
+			<option value="Spirit Airlines">Spirit Airlines</option>
+			<option value="Trans World Airways">Trans World Airways</option>
+			<option value="United Airlines">United Airlines</option>
+			<option value="US Airways">US Airways</option>
+			<option value="Virgin America">Virgin America</option>
+		</select>
+		<br>
+		<button>Get Chart</button>
 		</p>
 
 		<div id="tooltip" class="hidden">
@@ -72,17 +97,20 @@
 
 		<script type="text/javascript">
 
-			var testdata = [];
+			//Length of description text paragraph for hover tooltip offset
+			var textParLength = 130;
 
 			//Create event to listen for user input clicks to update data
-			d3.selectAll('input')
+			d3.selectAll('button')
 				.on("click", getData);
 
 			function getData(){
 
 				d3.select("svg").remove();
 
-				var airline_name = document.querySelector('input[name=airline]:checked').value;
+				//Get airline name from input drop down list
+				airline_name = document.getElementById("airline_sel");
+				airline_name = airline_name.options[airline_name.selectedIndex].value;
 
 				//var airline_name = document.getElementByName("airline").value;
 
@@ -112,6 +140,9 @@
 				}
 				else if(airline_name == "United Airlines"){
 					var airline_color = "cornflowerblue";
+				}
+				else{
+					airline_color = "darkslategrey";
 				};
 
 				const depdelays_url = '/JSON_data/yearly_dep_delay.json';
@@ -127,8 +158,6 @@
 
 					//Create filtered datasets based on user input
 					dataset = dataset.filter(d=>d.carrier_name==airline_name)
-
-			    testdata.push(dataset);
 
 			    //Width and height
 			    var w = 1200;
@@ -195,7 +224,7 @@
 
 							//Get this bar's x/y values, then augment for the tooltip
 							var xPosition = parseFloat(d3.select(this).attr("x")) + xScale.bandwidth() / 2;
-							var yPosition = parseFloat(d3.select(this).attr("y")) / 2 + h / 2;
+							var yPosition = (parseFloat(d3.select(this).attr("y")) / 2 + h / 2) + textParLength;
 
 							//Update the tooltip position and value
 							d3.select("#tooltip")
