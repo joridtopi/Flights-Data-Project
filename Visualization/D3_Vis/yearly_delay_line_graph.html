@@ -24,7 +24,7 @@
 	<body>
 
 		<p style="width: 1400px;">
-			<b>Description:</b> <br>This chart displays a time series line graph of the average yearly delay in minutes for a selected air carrier. The chart supports up to 9 different lines for comparing the average yearly delay of multiple air carriers.
+			<b>Description:</b> <br>This chart displays a time series line graph of the average yearly delay in minutes for a selected air carrier. The chart supports up to 10 different lines for comparing the average yearly delay of multiple air carriers.
 			<br><br>
 			<b>Guide:</b> <br>Select an air carrier from the drop down lists. The list contains every air carrier that has a recorded domestic flight between the years 1987 and 2019. Click the "Get Chart" button to update the graph.
 			<br><br>
@@ -396,9 +396,8 @@
 
 		<script type="text/javascript">
 
-			//Obtain input data from database
-			//const depdelays_url = 'http://localhost:3000/depdelays/year';
-			const depdelays_url = '/JSON_data/yearly_dep_delay.json';
+			//Obtain input data
+			const data_input = '/JSON_data/yearly_dep_delay.json';
 
 			//Global variable of the dataset
 			var datasetGlobal = [];
@@ -461,7 +460,7 @@
 
 			//Update the input data
 			function getData(){
-				d3.json(depdelays_url)
+				d3.json(data_input)
 				.then(function(dataset) {
 
 				//Obtain user inputs

@@ -399,9 +399,8 @@
 
 			var inputsel = [];
 
-			//Obtain input data from database
-			//const depdelays_url = 'http://localhost:3000/aircraft/year';
-			const depdelays_url = '/JSON_data/yearly_aircraft_count.json';
+			//Obtain input data
+			const data_input = '/JSON_data/yearly_aircraft_count.json';
 
 			//Global variable of the dataset
 			var datasetGlobal = [];
@@ -465,7 +464,7 @@
 
 			//Update the input data
 			function getData(){
-				d3.json(depdelays_url)
+				d3.json(data_input)
 			.then(function(dataset) {
 
 				//Obtain user inputs
