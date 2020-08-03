@@ -1,4 +1,101 @@
 
+
+1. Yearly Analysis of Domestic Flight Data
+
+The year 1987 is not used since data is incomplete for this year. 
+
+1.1 Domestic Flights
+
+1.1.1 Number of Scheduled Flights 
+
+Num_Sched_Flights_Year	- check
+
+1.1.2 Number of Departed Flights
+
+Num_Dep_Flights_Year - check
+
+1.1.3 Average Departure and Arrival Delay of Departed Flights
+
+Avg_Dly_Year - check
+
+1.1.5 Number of Cancelled Flights
+
+Num_Canc_Flights_Year - check
+
+1.1.6 Percentage of Cancelled Flights
+
+Pct_Canc_Flights_Year
+
+1.1.7 Number of Aircraft Used (Very long query time - 20 min) - up to year 2012
+
+No data for 2002
+
+Num_AC_Used_Year - check
+
+1.1.8 Number of Distinct Flight Routes
+
+Num_Flight_Routes_Year
+
+1.1.9 Number of Flight Miles Scheduled
+
+Num_Sched_Flight_Miles_Year
+
+1.1.10 Number of Flight Miles Flown
+
+Num_Dep_Flight_Miles_Year
+
+1.1.11 Percentage of Scheduled Miles Flown
+
+Pct_Flight_Miles_Flown_Year
+
+1.1.12 Number of Miles Per Flight Scheduled
+
+Num_Sched_Miles_Per_Flight_Year
+
+1.1.13 Number of Miles Per Flight Flown 
+
+Num_Dep_Miles_Per_Flight_Year
+
+
+1.1.14 Total Delay Minutes
+
+
+1.1.15 Total Weather Delay Minutes
+
+
+1.1.16 Total X Delay Minutes
+
+
+
+
+
+
+1.2 Domestic Flights Grouped by Air Carrier
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Airline Delay Dashboard
 
 Description
