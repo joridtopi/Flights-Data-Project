@@ -24,46 +24,92 @@ Num_Canc_Flights_Year - check
 
 1.1.6 Percentage of Cancelled Flights
 
-Pct_Canc_Flights_Year
+Pct_Canc_Flights_Year - check
 
-1.1.7 Number of Aircraft Used (Very long query time - 20 min) - up to year 2012
+1.1.7 Number of Aircraft Used (Very long query time - 20 min) 
 
-No data for 2002
+No data for 2002, 2001, 1987-1994
 
-Num_AC_Used_Year - check
+Num_AC_Used_Year - check - need to remove 1988-1994
 
-1.1.8 Number of Distinct Flight Routes
+1.1.8 Number of Distinct Flight Routes as Planned
 
-Num_Flight_Routes_Year
+Num_Flight_Routes_Year - Check
 
 1.1.9 Number of Flight Miles Scheduled
 
-Num_Sched_Flight_Miles_Year
+Num_Sched_Flight_Miles_Year - Check
 
 1.1.10 Number of Flight Miles Flown
 
-Num_Dep_Flight_Miles_Year
+Num_Dep_Flight_Miles_Year - Check
 
 1.1.11 Percentage of Scheduled Miles Flown
 
-Pct_Flight_Miles_Flown_Year
+Pct_Flight_Miles_Flown_Year - check
 
 1.1.12 Number of Miles Per Flight Scheduled
 
-Num_Sched_Miles_Per_Flight_Year
+Num_Sched_Miles_Per_Flight_Year - check
 
 1.1.13 Number of Miles Per Flight Flown 
 
 Num_Dep_Miles_Per_Flight_Year
 
 
-1.1.14 Total Delay Minutes
+1.1.14 Total Departure Delay Minutes
+
+Total_Departure_Delay_Year - Check
+
+dep_delay
 
 
 1.1.15 Total Weather Delay Minutes
 
+Total_Weather_Delay_Year - Check
 
-1.1.16 Total X Delay Minutes
+weather_delay
+
+
+1.1.16 Total Carrier Delay Minutes
+
+Total_Carrier_Delay_Year - Check
+
+carrier_delay 
+
+
+1.1.17 Total NAS Delay Minutes
+
+Total_Nas_Delay_Year - Check 
+
+nas_delay
+
+
+1.1.18 Total Security Delay Minutes
+
+Total_Security_Delay_Year - Check
+
+security_delay
+
+
+1.1.19 Total Late AC Delay Minutes
+
+Total_Late_Ac_Delay_Year - Check
+
+late_ac_delay
+
+
+1.1.20 Total Arrival Delay Minutes
+
+Total_Arrival_Delay_Year - Check
+
+arr_delay 
+
+
+
+Number of Air Carriers
+
+Num_Air_Carriers_Year 
 
 
 
@@ -76,8 +122,12 @@ Num_Dep_Miles_Per_Flight_Year
 
 
 
-
-
+total_yearly_dep_delay.json
+yearly_aircraft_count.json
+yearly_airline_count.json
+yearly_airline_flight_count.json
+yearly_dep_delay.json
+yearly_route_count.json
 
 
 

@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Number of Routes Per Year</title>
-		<script type="text/javascript" src="d3.js"></script>
+		<script type="text/javascript" src="../../../D3 Lib/d3.js"></script>
 		<style type="text/css">
 		p {
 			font-family: Helvetica, sans-serif;
@@ -58,15 +58,14 @@
 
 
 
-			const yearlyroutes_url = '/JSON_data/yearly_airline_count.json';
-			//const yearlyroutes_url = 'http://localhost:3000/yearlyroutes/year';
+			const yearlyroutes_url = '../../../JSON_data/Yearly Analysis/Total Flights/Total_Flights_Year_Table.json';
 
 			//Graphic of number of unique routes for each year for selected airline
 			d3.json(yearlyroutes_url)
 			.then(function(dataset) {
 
 				dataset.forEach(function(d){
-					d.count = +d.count;
+					d.count = +d.num_air_carriers_year;
 				});
 
 

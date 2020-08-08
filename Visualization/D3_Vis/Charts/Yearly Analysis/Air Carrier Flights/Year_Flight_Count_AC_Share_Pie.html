@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<title> </title>
-		<script type="text/javascript" src="../d3.js"></script>
+		<script type="text/javascript" src="../../../D3 Lib/d3.js"></script>
 		<style type="text/css">
 
 			p {
@@ -55,7 +55,7 @@
 		<br><br>
 		<b>User Inputs:</b>
 		<br>Select Year:
-		<input type="number" id="inputYear" min="1987" max="2019" step="1" value = "2019"/>
+		<input type="number" id="inputYear" min="1988" max="2019" step="1" value = "2019"/>
 		<button>Get Chart</button>
 		</p>
 
@@ -93,7 +93,7 @@
 			var testdata = [];
 
 			//Data path
-			const airline_flight_count_data = '/JSON_data/yearly_airline_flight_count.json';
+			const airline_flight_count_data = '../../../JSON_data/Yearly Analysis/Air Carrier Flights/Total_Flights_Year_Table_Ac.json';
 
 			//Create event to listen for user input clicks to update data
 			d3.selectAll('button')
@@ -114,7 +114,7 @@
 
 					//Convert count to numeric
 					dataset.forEach(function(d){
-						d.count = +d.count;
+						d.count = +d.num_sched_flights_year;
 					});
 
 					//Create filtered datasets based on user input
