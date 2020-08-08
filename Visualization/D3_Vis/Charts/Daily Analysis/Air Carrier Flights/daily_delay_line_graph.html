@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Number of Aircraft Per Year</title>
-		<script type="text/javascript" src="d3.js"></script>
+		<script type="text/javascript" src="../../../D3 Lib/d3.js"></script>
 		<style type="text/css">
 			p {
 				font-family: Helvetica, sans-serif;
@@ -24,11 +24,11 @@
 	<body>
 
 		<p style="width: 1400px;">
-			<b>Description:</b> <br>This chart displays a time series line graph of the yearly flight route count for a selected air carrier. The chart supports up to 10 different lines for comparing the yearly route count of multiple air carriers.
+			<b>Description:</b> <br>This chart displays a time series line graph of the average daily delay in minutes for a selected air carrier. The chart supports up to 10 different lines for comparing the average daily delay of multiple air carriers.
 			<br><br>
 			<b>Guide:</b> <br>Select an air carrier from the drop down lists. The list contains every air carrier that has a recorded domestic flight between the years 1987 and 2019. Click the "Get Chart" button to update the graph.
 			<br><br>
-			<b>Features:</b> <br>Zoom in and out of the time scale for a more detailed view of the yearly flight route count on a particular year. Drag the line left and right along the time scale.
+			<b>Features:</b> <br>Zoom in and out of the time scale for a more detailed view of the average daily delay on a particular date. Drag the line left and right along the time scale.
 			<br><br>
 			<b>User Inputs:</b>
 			<br>Line 0: <select id="input0" style="color:seagreen" style="font-weight:bold">
@@ -392,16 +392,15 @@
 			</select>
 			<br><br>
 			<button>Get Chart</button>
+			</p>
 		</p>
 
 
 
 		<script type="text/javascript">
 
-			var inputsel = [];
-
 			//Obtain input data
-			const data_input = '/JSON_data/yearly_route_count.json';
+			const data_input = '../../../JSON_data/daily_dep_delay.json';
 
 			//Global variable of the dataset
 			var datasetGlobal = [];
@@ -505,8 +504,8 @@
 
 				//Convert input data to appropriate data types
 				dataset.forEach(function(d){
-					d.count = +d.count;
-					d.fl_date = new Date(String(d.fl_year));
+					d.avg_dep_dly = +d.avg_dep_dly;
+					d.fl_date = new Date(String(d.fl_date));
 				});
 
 				//Create dataset filtered on selected inputs
@@ -542,8 +541,8 @@
 						   .range([0, w - x_pad]);
 
 				yScale = d3.scaleLinear()
-							.domain([d3.min(datasetGlobal, function(d) { return d.count; }),
-											 d3.max(datasetGlobal, function(d) { return d.count; })])
+							.domain([d3.min(datasetGlobal, function(d) { return d.avg_dep_dly; }),
+											 d3.max(datasetGlobal, function(d) { return d.avg_dep_dly; })])
 							.range([h - y_pad, 0]);
 
 				//Create axes based on X and Y scales
@@ -553,7 +552,7 @@
 				//Define line generator
 				line = d3.line()
 							.x(function(d) { return xScale(d.fl_date) + x_pad; })
-							.y(function(d) { return yScale(d.count); });
+							.y(function(d) { return yScale(d.avg_dep_dly); });
 
 				//Remove any previous axes for a refresh property
 				d3.selectAll("g.axis").remove();
@@ -582,7 +581,6 @@
 					.attr("stroke-width", "2px")
 					.attr("fill", "none")
 					.attr("d", line);
-
 
 				line1Add = svg.append("path")
 					.datum(dataset1)
@@ -686,8 +684,8 @@
 
 				//Create new y scale based on filtered data
 				yScaleNew = d3.scaleLinear()
-								.domain([d3.min(newDataset, function(d) { return d.count; }),
-												 d3.max(newDataset, function(d) { return d.count; })])
+								.domain([d3.min(newDataset, function(d) { return d.avg_dep_dly; }),
+												 d3.max(newDataset, function(d) { return d.avg_dep_dly; })])
 								.range([h - y_pad, 0]);
 
 				//Update axes with the new boundaries
@@ -697,7 +695,7 @@
 				//Create new line path with updated x-scale and same y-scale
 				newLine = d3.line()
 							.x(function(d) { return xScaleNew(d.fl_date); })
-							.y(function(d) { return yScaleNew(d.count); });
+							.y(function(d) { return yScaleNew(d.avg_dep_dly); });
 
 				//Update each line with the new line path
 				line1Add.attr("d", newLine);

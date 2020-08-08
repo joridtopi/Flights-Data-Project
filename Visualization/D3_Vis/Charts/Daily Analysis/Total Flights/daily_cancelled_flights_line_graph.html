@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Number of Aircraft Per Year</title>
-		<script type="text/javascript" src="d3.js"></script>
+		<script type="text/javascript" src="../../../D3 Lib/d3.js"></script>
 		<style type="text/css">
 			p {
 				font-family: Helvetica, sans-serif;
@@ -18,7 +18,7 @@
 	<body>
 		<p>
 			<p>
-				<b>Description:</b> <br>This chart displays a time series of the average daily delay for all domestic flights from the year 1987 to 2019.
+				<b>Description:</b> <br>This chart displays a time series of the total recorded daily cancelled flight count from the year 1987 to 2019.
 			<br><br>
 				<b>Features:</b> <br>Zoom in on the time scale using mouse scroller or touchpad. Drag the line along the time scale. Refresh page to obtain the original scale.
 			<br><br>
@@ -31,7 +31,7 @@
 
 
 			//Path to data input
-			const daily_flight_count_data = 'JSON_data/total_daily_dep_delay.json';
+			const daily_flight_count_data = '../../../JSON_data/number_daily_cancelled_flights.json';
 
 			//Global variable of the dataset
 			var datasetGlobal = [];
@@ -85,7 +85,7 @@
 
 				//Convert input data to appropriate data types
 				dataset.forEach(function(d){
-					d.count = +d.avg_dep_dly;
+					d.count = +d.count;
 					d.fl_date = new Date(String(d.fl_date));
 				});
 
@@ -137,7 +137,7 @@
 					.datum(datasetGlobal)
 					.attr("clip-path", "url(#clip)")
 					.attr("class", "line")
-					.attr("stroke", "seagreen")
+					.attr("stroke", "crimson")
 					.attr("stroke-width", "2px")
 					.attr("fill", "none")
 					.attr("d", line);

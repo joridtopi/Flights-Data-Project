@@ -2,8 +2,8 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>Average Delay Per Year</title>
-		<script type="text/javascript" src="d3.js"></script>
+		<title>Number of Routes Per Year</title>
+		<script type="text/javascript" src="../../../D3 Lib/d3.js"></script>
 		<style type="text/css">
 		p {
 			font-family: Helvetica, sans-serif;
@@ -44,18 +44,16 @@
 	</head>
 	<body>
 		<p style="width: 1200px;">
-		<b>Description:</b> <br>This chart displays a bar graph of the average daily delay in minutes for a selected air carrier and month.
+		<b>Description:</b> <br>This chart displays a bar graph of total distinct routes flown by the selected air carrier by year.
 		<br><br>
-		<b>Guide:</b> <br>Select an air carrier from the drop down list. The list contains every air carrier that has a recorded domestic flight between the years 1987 and 2019. Select any month between 1987 and 2019. Click the "Get Chart" button to update the graph.
+		<b>Guide:</b> <br>Select an air carrier from the drop down list. The list contains every air carrier that has a recorded domestic flight between the years 1987 and 2019. Click the "Get Chart" button to update the graph.
 		<br><br>
 		<b>Features:</b> <br>Hover over any bar in the chart to obtain more details about that observation.
 		<br><br>
 		<b>User Inputs:</b>
-		<br>Select Month <input type="month" id="inputMonth" min="1987-01" max="2019-12">
-
 		<br>Select Air Carrier:
 		<select id="airline_sel">
-			<option value="AirTran Airways Corporation">AirTran Airways</option>
+			<option value="AirTran Airways">AirTran Airways</option>
 			<option value="Alaska Airlines">Alaska Airlines</option>
 			<option value="Allegiant Air">Allegiant Air</option>
 			<option value="Aloha Air Cargo">Aloha Air Cargo</option>
@@ -76,7 +74,7 @@
 			<option value="Midway Airlines">Midway Airlines</option>
 			<option value="Northwest Airlines">Northwest Airlines</option>
 			<option value="Pacific Southwest Airlines">Pacific Southwest Airlines</option>
-			<option value="Pan American World Airways">Pan American World Airways</option>
+			<option value="Pan American Airways">Pan American Airways</option>
 			<option value="Piedmont Aviation">Piedmont Aviation</option>
 			<option value="PSA Airlines">PSA Airlines</option>
 			<option value="Republic Airline">Republic Airline</option>
@@ -91,13 +89,12 @@
 		<br>
 		<button>Get Chart</button>
 		</p>
-		</p>
 
 		<div id="tooltip" class="hidden">
-			<p><strong>Departure Delay: Daily Average</strong></p>
-			<p>Date: <span id="date">100</span></p>
-			<p>Avg Delay: <span id="value">100</span> Minutes</p>
+			<p><strong>Number of Routes Flown</strong></p>
+			<p><span id="value">100</span></p>
 		</div>
+
 
 		<script type="text/javascript">
 
@@ -116,17 +113,6 @@
 				airline_name = document.getElementById("airline_sel");
 				airline_name = airline_name.options[airline_name.selectedIndex].value;
 
-				//Get input month and convert from UTC time (add one day)
-				inputMonth = document.getElementById("inputMonth").value;
-				inputDateRaw = new Date(String(inputMonth));
-				inputDateRaw.setDate(inputDateRaw.getDate() + 1);
-				inputDateRawYear = inputDateRaw.getFullYear();
-				inputDateRawMonth = inputDateRaw.getMonth()+1;
-				//Obtain Year and Month from input to filter by
-				yearFilter = inputDateRawYear;
-				monthFilter = inputDateRawMonth;
-
-				//Set the chart color code by selected airline
 				if(airline_name == "Alaska Airlines"){
 					var airline_color = "seagreen";
 				}
@@ -158,93 +144,72 @@
 					airline_color = "darkslategrey";
 				};
 
-				//URL for the data API
-				const depdelays_url = 'JSON_data/daily_dep_delay.json';
-				//const depdelays_url = 'http://localhost:3000/depdelays/daily';
 
-				//Graphic for Average Departure delays for each year for selected airline
-			  d3.json(depdelays_url)
-			  .then(function(dataset) {
+				const yearlyroutes_url = '../../../JSON_data/Yearly Analysis/Air Carrier Flights/Total_Flights_Year_Table_Ac.json';
 
-					//Conver the API data to float and date formats
-			    dataset.forEach(function(d){
-			      d.avg_dep_dly = +d.avg_dep_dly;
-						d.fl_date = new Date(String(d.fl_date));
-			    });
+				//Graphic of number of unique routes for each year for selected airline
+				d3.json(yearlyroutes_url)
+				.then(function(dataset) {
 
-					//Extract the time elements from date string and reformat date for display
 					dataset.forEach(function(d){
-						d.year = d.fl_date.getFullYear();
-			      d.month = d.fl_date.getMonth()+1;
-						d.day = d.fl_date.getDate();
-						d.newDate = d.month + "/" + d.day + "/" + d.year;
-			    });
+						d.count = +d.num_flight_routes_year;
+					});
 
 					//Create filtered datasets based on user input
-					dataset = dataset.filter(d=>d.carrier_name==airline_name
-																			& d.year==yearFilter
-																			& d.month==monthFilter);
+					dataset = dataset.filter(d=>d.carrier_name==airline_name)
 
+					//Width and height
+					var w = 1100;
+					var h = 600;
 
-			    //Width and height
-			    var w = 1200;
-			    var h = 600;
-
-			    //X-padding
+					//X-padding
 			    var x_pad = 60;
 			    //Y-padding
-			    var y_pad = 60;
+			    var y_pad = 40;
 
-					//Set the y-domain for the bar graph according to the y data range
-					var yDomainMinMargin = (d3.max(dataset, function(d){return d.avg_dep_dly;}) - d3.min(dataset, function(d){return d.avg_dep_dly;})) * 0.3
-					var yDomainMin = d3.min(dataset, function(d){return d.avg_dep_dly;}) - yDomainMinMargin;
+					var xScale = d3.scaleBand()
+									.domain(d3.range(dataset.length))
+									.rangeRound([0, w-x_pad])
+									.paddingInner(0.05);
 
-					//Obtain X and Y scales
-			    var xScale = d3.scaleBand()
-			            .domain(d3.range(dataset.length))
-			            .rangeRound([0, w-x_pad])
-			            .paddingInner(0.05);
+					var yScale = d3.scaleLinear()
+									.domain([0, d3.max(dataset, function(d){return d.count;})])
+									.range([0, h-y_pad]);
 
-			    var yScale = d3.scaleLinear()
-			            .domain([yDomainMin,
-													 d3.max(dataset, function(d){return d.avg_dep_dly;})])
-			            .range([0, h-y_pad]);
-
-			    var xAxisScale = d3.scaleBand()
-			        .domain(dataset.map(function(d){return d.newDate;}))
+					var xAxisScale = d3.scaleBand()
+			        .domain(dataset.map(function(d){return d.fl_year;}))
 			        .rangeRound([0, w-x_pad]);
 
 			    var yAxisScale = d3.scaleLinear()
-			            .domain([yDomainMin,
-													 d3.max(dataset, function(d){return d.avg_dep_dly;})])
+			            .domain([0, d3.max(dataset, function(d){return d.count;})])
 			            .range([h-y_pad,0]);
 
-					//Create X and Y axes
 			    var xAxis = d3.axisBottom(xAxisScale);
+
 			    var yAxis = d3.axisLeft(yAxisScale);
 
-			    //Create SVG element
-			    var svg = d3.select("body")
-			          .append("svg")
-			          .attr("width", w)
-			          .attr("height", h);
+					//Create SVG element
+					var svg = d3.select("body")
+								.append("svg")
+								.attr("width", w)
+								.attr("height", h);
 
-			    //Create bars
-			    svg.selectAll("rect")
-			       .data(dataset)
-			       .enter()
-			       .append("rect")
-			       .attr("x", function(d, i) {
-			          return xScale(i) + x_pad;
-			       })
-			       .attr("y", function(d) {
-			          return h - yScale(d.avg_dep_dly) - y_pad;
-			       })
-			       .attr("width", xScale.bandwidth())
-			       .attr("height", function(d) {
-			          return yScale(d.avg_dep_dly);
-			       })
-			       .attr("fill", airline_color)
+					//Create bars
+					svg.selectAll("rect")
+						 .data(dataset)
+						 .enter()
+						 .append("rect")
+						 .attr("x", function(d, i) {
+								return xScale(i) + x_pad;
+						 })
+						 .attr("y", function(d) {
+								return h - yScale(d.count) - y_pad;
+						 })
+						 .attr("width", xScale.bandwidth())
+						 .attr("height", function(d) {
+								return yScale(d.count);
+						 })
+						 .attr("fill", airline_color)
 						 .attr("stroke", "whitesmoke")
 						 .on("mouseover", function(d){
 							 d3.select(this)
@@ -259,13 +224,8 @@
 							d3.select("#tooltip")
 								.style("left", xPosition + "px")
 								.style("top", yPosition + "px")
-								.select("#date")
-								.text(d.newDate);
-
-							//Update the tooltip position and value
-							d3.select("#tooltip")
 								.select("#value")
-								.text(Math.round(d.avg_dep_dly * 100) / 100);
+								.text(d.count);
 
 							//Show the tooltip
 							d3.select("#tooltip").classed("hidden", false);
@@ -283,25 +243,24 @@
 
 						 });
 
+			 		//Create x-axis
+		      svg.append("g")
+		      .attr("class", "axis")
+		      .attr("transform","translate(" + x_pad + "," + (h-y_pad) + ")")
+		        .call(xAxis)
+		      .selectAll("text")
+		      .style("text-anchor", "end")
+		      .attr("dx", "-.8em")
+		      .attr("dy", ".15em")
+		      .attr("transform", "rotate(-65)");
 
-			    //Create x-axis
-			      svg.append("g")
-			     .attr("class", "axis")
-			     .attr("transform","translate(" + x_pad + "," + (h-y_pad) + ")")
-			       .call(xAxis)
-			     .selectAll("text")
-			     .style("text-anchor", "end")
-			     .attr("dx", "-.8em")
-			     .attr("dy", ".15em")
-			     .attr("transform", "rotate(-65)");
+ 			   //Create y-axis
+ 			    svg.append("g")
+ 			    .attr("class", "axis")
+ 			    .attr("transform","translate(" + x_pad + ",0)")
+ 			    .call(yAxis);
 
-			   //Create y-axis
-			    svg.append("g")
-			     .attr("class", "axis")
-			     .attr("transform","translate(" + x_pad + ",0)")
-			     .call(yAxis);
-
-			    });
+					});
 				}
 
 		</script>

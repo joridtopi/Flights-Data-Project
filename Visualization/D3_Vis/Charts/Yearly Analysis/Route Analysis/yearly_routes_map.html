@@ -3,12 +3,12 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Number of Routes Per Year</title>
-		<script type="text/javascript" src="d3.js"></script>
+		<script type="text/javascript" src="../../../D3 Lib/d3.js"></script>
 		<style type="text/css">
+
 		p {
 			font-family: Helvetica, sans-serif;
 			font-size: 14px;
-			font-weight: bold;
 		}
 
 		input[type=checkbox] {
@@ -44,54 +44,82 @@
 		</style>
 	</head>
 	<body>
-		<p>
-		Select Date:
-		<input type="date" id="inputDate" min = "1987-10-01" max = "2019-12-31"/>
-		Select Origin:
+		<p style="width: 1250px;">
+		<b>Description:</b> <br>This chart displays a route map for a selected airline, year, minimum flight count, and origin. A ranking of each route is displayed below the map either by flight count or average departure delay, as selected by the user.
+		<br><br>
+		<b>Guide:</b> <br>Select an air carrier from the drop down list. The list contains every air carrier that has a recorded domestic flight between the years 1987 and 2019. Select any year between 1987 and 2019. Enter an origin airport using a 3-letter airport code in all caps or enter "All Origins" to filter on the departure airport. Enter a minimum route count, which filters out routes that were flown less than this threshold. Select the route rank criteria for the route ranking below the map. Ranking by route count will rank the filtered routes from the most to least frequently flown. Ranking by average delay will rank the filtered routes from the longest average departure delay in minutes to the shortest.
+		<br><br>Click the "Get Chart" button and wait a few seconds for the data to load and the charts to update.
+		<br><br>
+		<b>Features:</b> <br>Hover over any bar in the bar chart below the map to obtain more details about that route. If filtering on an origin, hover on any destination bubble on the map for more details on that route.
+		<br><br>
+		<b>User Inputs:</b>
+		<br>Select Air Carrier:
+		<select id="airline_sel">
+			<option value="AirTran Airways Corporation">AirTran Airways</option>
+			<option value="Alaska Airlines">Alaska Airlines</option>
+			<option value="Allegiant Air">Allegiant Air</option>
+			<option value="Aloha Air Cargo">Aloha Air Cargo</option>
+			<option value="America West Airlines">America West Airlines</option>
+			<option value="American Airlines">American Airlines</option>
+			<option value="ATA Airlines">ATA Airlines</option>
+			<option value="Continental Airlines">Continental Airlines</option>
+			<option value="Delta Airlines">Delta Airlines</option>
+			<option value="Eastern Airlines">Eastern Airlines</option>
+			<option value="Endeavor Air">Endeavor Air</option>
+			<option value="Envoy Air">Envoy Air</option>
+			<option value="ExpressJet Airlines">ExpressJet Airlines</option>
+			<option value="Frontier Airlines">Frontier Airlines</option>
+			<option value="Hawaiian Airlines">Hawaiian Airlines</option>
+			<option value="Independence Air">Independence Air</option>
+			<option value="JetBlue Airways">JetBlue Airways</option>
+			<option value="Mesa Airlines">Mesa Airlines</option>
+			<option value="Midway Airlines">Midway Airlines</option>
+			<option value="Northwest Airlines">Northwest Airlines</option>
+			<option value="Pacific Southwest Airlines">Pacific Southwest Airlines</option>
+			<option value="Pan American World Airways">Pan American World Airways</option>
+			<option value="Piedmont Aviation">Piedmont Aviation</option>
+			<option value="PSA Airlines">PSA Airlines</option>
+			<option value="Republic Airline">Republic Airline</option>
+			<option value="SkyWest Airlines">SkyWest Airlines</option>
+			<option value="Southwest Airlines">Southwest Airlines</option>
+			<option value="Spirit Airlines">Spirit Airlines</option>
+			<option value="Trans World Airways">Trans World Airways</option>
+			<option value="United Airlines">United Airlines</option>
+			<option value="US Airways">US Airways</option>
+			<option value="Virgin America">Virgin America</option>
+		</select>
+		<br>Select Year:
+		<input type="number" id="inputYear" min="1987" max="2019" step="1" value = "2019"/>
+		<br>Select Origin:
 		<input type="text" id="inputOrigin" value = "All Origins"/>
-		<label>Rank Route By: </label>
+		<br><label>Min Flight Count: </label>
+		<input type="text" id="inputFlightCount" value = "10"/>
+		<br><label>Rank Route By: </label>
 		<select id="rankSel">
 		<option value="routeCount">Route Count</option>
 		<option value="routeDelay">Average Route Delay</option>
 		</select>
 		<br>
-		<input type="radio" id="input1" name="airline" value="Alaska Airlines Inc.">
-		<label for="airline1" style="color:seagreen"> Alaska Airlines</label>
-		<input type="radio" id="input2" name="airline" value="American Airlines Inc.">
-		<label for="airline2" style="color:slategray"> American Airlines</label>
-		<input type="radio" id="input3" name="airline" value="Delta Air Lines Inc.">
-		<label for="airline3" style="color:darkred"> Delta Airlines</label>
-		<input type="radio" id="input4" name="airline" value="Frontier Airlines Inc.">
-		<label for="airline4" style="color:yellowgreen"> Frontier Airlines</label>
-		<input type="radio" id="input5" name="airline" value="Hawaiian Airlines Inc.">
-		<label for="airline5" style="color:orchid"> Hawaiian Airlines</label>
-		<input type="radio" id="input6" name="airline" value="JetBlue Airways">
-		<label for="airline6" style="color:skyblue"> JetBlue Airways</label>
-		<input type="radio" id="input7" name="airline" value="Southwest Airlines Co.">
-		<label for="airline7" style="color:indigo"> Southwest Airlines</label>
-		<input type="radio" id="input8" name="airline" value="Spirit Air Lines">
-		<label for="airline8" style="color:gold"> Spirit Airlines</label>
-		<input type="radio" id="input9" name="airline" value="United Air Lines Inc.">
-		<label for="airline9" style="color:cornflowerblue"> United Airlines</label>
+		<button>Get Chart</button>
 		</p>
 
 		<div id="tooltip" class="hidden">
 			<p><strong>Airline: </strong><span id="airlineDisp"></span></p><br>
 			<p><strong>Origin - </strong><span id="originDisp"></span></p><br>
 			<p><strong>Dest - </strong><span id="destDisp"></span></p><br>
-			<p><strong>Date: </strong><span id="yearDisp"></span></p><br>
-			<p><strong>Departure Time: </strong><span id="depTime"></span></p><br>
-			<p><strong>Departure Delay: </strong><span id="depDelay">100</span> Minutes</p>
+			<p><strong>Year: </strong><span id="yearDisp"></span></p><br>
+			<p><strong>Average Departure Delay: </strong><span id="value">100</span> Minutes</p><br>
+			<p><strong>Number of Flights: </strong><span id="countDisp"></span></p>
 		</div>
 
 
 		<script type="text/javascript">
 
+
 			//Declare global user input variables to be updated by the fetch function
 			var airline_name = [];
 			var input_origin = [];
 			var input_year = [];
-			var input_date = [];
 			var input_rank = [];
 			var airline_color = [];
 			var input_flight_count = [];
@@ -106,10 +134,13 @@
 			var routeDataCount = [];
 			var routeDataDelay = [];
 
+			//Length of description text paragraph for hover tooltip offset
+			var textParLength = 130;
+
 
 			//Create event to listen for user input clicks to update data
-			d3.selectAll('input')
-				.on("change", updateCharts);
+			d3.selectAll('button')
+				.on("click", updateCharts);
 
 			//Flow control function for building charts
 			function updateCharts(){
@@ -118,50 +149,61 @@
 				getRouteDataCount(airline_name);
 				getRouteDataDelay(airline_name);
 				refreshCharts();
-				//createMap();
+				createMap();
 				setTimeout(function(){
-    			//getCircles(geoData);
-					//getFlightPaths(geoData);
-					routeDelayBarChart(routeDataDelay);
-				},10000);
+    			getCircles(geoData);
+					getFlightPaths(geoData);
+					if(input_rank == "routeCount"){
+						routeCountBarChart(routeDataCount);
+					} else if (input_rank == "routeDelay"){
+						routeDelayBarChart(routeDataDelay);
+					};
+				},2500);
 			}
 
 			//Updates user input globals based on current selections
 			function fetchUserInputs(){
-				//Fetch user inputs
-				airline_name = document.querySelector('input[name=airline]:checked').value;
+
+				airline_name = document.getElementById("airline_sel");
+				airline_name = airline_name.options[airline_name.selectedIndex].value;
 				input_origin = document.getElementById('inputOrigin').value;
-				input_date = document.getElementById('inputDate').value;
-				input_raw = new Date(String(input_date));
-				input_year = input_raw.getYear() + 1900;
+				input_year = document.getElementById('inputYear').value;
+				input_rank = document.getElementById('rankSel').value;
+				input_flight_count = +document.getElementById('inputFlightCount').value;
 
 				//Fetch airline color based on user input
-				if(airline_name == "Alaska Airlines Inc."){
+				if(airline_name == "Alaska Airlines"){
 					airline_color = "seagreen";
 				}
-				else if(airline_name == "American Airlines Inc."){
+				else if(airline_name == "American Airlines"){
 					airline_color = "slategray";
 				}
-				else if(airline_name == "Delta Air Lines Inc."){
+				else if(airline_name == "Delta Airlines"){
 					airline_color = "darkred";
 				}
-				else if(airline_name == "Frontier Airlines Inc."){
+				else if(airline_name == "Frontier Airlines"){
 					airline_color = "yellowgreen";
 				}
-				else if(airline_name == "Hawaiian Airlines Inc."){
+				else if(airline_name == "Hawaiian Airlines"){
 					airline_color = "orchid";
 				}
 				else if(airline_name == "JetBlue Airways"){
 					airline_color = "skyblue";
 				}
-				else if(airline_name == "Southwest Airlines Co."){
+				else if(airline_name == "Southwest Airlines"){
 					airline_color = "indigo";
 				}
-				else if(airline_name == "Spirit Air Lines"){
+				else if(airline_name == "Spirit Airlines"){
 					airline_color = "gold";
 				}
-				else if(airline_name == "United Air Lines Inc."){
+				else if(airline_name == "United Airlines"){
 					airline_color = "cornflowerblue";
+				}
+				else if(airline_name == "SkyWest Airlines"){
+					airline_color = "cornflowerblue";
+				}
+				else{
+					airline_color = "darkslategrey";
 				};
 			}
 
@@ -169,7 +211,8 @@
 			function getGeoData(airline){
 
 				//URL for geo data API
-				const yearlyroutes_geo_url = 'http://localhost:3000/yearlyroutes/geo/airline/'+airline;
+				//const yearlyroutes_geo_url = 'http://localhost:3000/yearlyroutes/geo/airline/'+airline;
+				const yearlyroutes_geo_url = '../../../JSON_data/flight_geo_data.json';
 
 				//Data conversions
 				d3.json(yearlyroutes_geo_url)
@@ -189,9 +232,11 @@
 					//Filter data based on user inputs. Filter or origin if input is not "All Origins"
 					if(input_origin == "All Origins"){
 						dataset = dataset.filter(d=>d.fl_year==input_year
+																				&d.carrier_name == airline_name
 																				&d.count >= input_flight_count);
 					} else{
 						dataset = dataset.filter(d=>d.fl_year==input_year
+																				&d.carrier_name == airline_name
 																				&d.count >= input_flight_count
 																				&d.origin==input_origin);
 					};
@@ -206,7 +251,8 @@
 			function getRouteDataCount(airline){
 
 				//URL for flight count data API
-				const	yearlyroutes_url = 'http://localhost:3000/yearlyroutes/count/airline/'+airline;
+				//const	yearlyroutes_url = 'http://localhost:3000/yearlyroutes/count/airline/'+airline;
+				const	yearlyroutes_url = '../../../JSON_data/flight_route_count.json';
 
 				//Data conversions
 				d3.json(yearlyroutes_url)
@@ -240,10 +286,9 @@
 			//Obtains route data sorted by average delay
 			function getRouteDataDelay(airline){
 
-
-
 				//URL for average flight delay data API
-				const yearlyroutes_url = '/dailyanalysis/'+input_year+'/'+input_date+'/'+airline_name;
+				//const yearlyroutes_url = 'http://localhost:3000/yearlyroutes/airline/'+airline;
+				const	yearlyroutes_url = '../../../JSON_data/flight_route_delay.json';
 
 				//Data conversions
 				d3.json(yearlyroutes_url)
@@ -251,9 +296,22 @@
 
 					//Convert strings to numericals and construct origin to dest string for y-axes
 					dataset.forEach(function(d){
-						d.avg_dep_dly = +d.dep_delay;
-						d.full_date = d.fl_year+'-'+d.fl_month+'-'+d.fl_day;
+						d.avg_dep_dly = +d.avg_dep_dly;
+						d.count= +d.count;
+						d.origin_dest = d.origin + "-" + d.dest;
 					});
+
+					//Filter data based on user inputs. Filter or origin if input is not "All Origins"
+					if(input_origin == "All Origins"){
+						dataset = dataset.filter(d=>d.carrier_name==airline_name
+																				& d.count >= input_flight_count
+																				& d.fl_year==input_year);
+					} else{
+						dataset = dataset.filter(d=>d.carrier_name==airline_name
+																				& d.fl_year==input_year
+																				& d.count >= input_flight_count
+																				& d.origin==input_origin);
+					};
 
 				//Populate global with post processed data
 				routeDataDelay = dataset;
@@ -295,7 +353,7 @@
 					.projection(projection);
 
 				//Append the map paths to the SVG
-				d3.json("us-states.json")
+				d3.json("../../../JSON_data/US Geo Map/us-states.json")
 				.then(function(json) {
 					svgMap.selectAll("path")
 						.data(json.features)
@@ -371,7 +429,7 @@
 
 						 //Get this bar's x/y values, then augment for the tooltip
 						 var xPosition = parseFloat(d3.select(this).attr("cx")) + 20;
-						 var yPosition = parseFloat(d3.select(this).attr("cy"));
+						 var yPosition = parseFloat(d3.select(this).attr("cy")) + textParLength;
 
 						 //Update the tooltip position and value
 						 d3.select("#tooltip")
@@ -510,7 +568,7 @@
 
 							//Get this bar's x/y values, then augment for the tooltip
 							var xPosition = parseFloat(d3.select(this).attr("x")) + xScaleNew(d.count) / 2;
-							var yPosition = parseFloat(d3.select(this).attr("y")) + (yScaleNew.bandwidth() / 2) + 600;
+							var yPosition = parseFloat(d3.select(this).attr("y")) + (yScaleNew.bandwidth() / 2) + 600 + textParLength;
 
 							//Update the tooltip position and value
 							d3.select("#tooltip")
@@ -533,7 +591,7 @@
 
 							d3.select("#tooltip")
 								.select("#yearDisp")
-								.text(d.fl_date);
+								.text(d.fl_year);
 
 							d3.select("#tooltip")
 								.select("#countDisp")
@@ -646,14 +704,14 @@
 
 						//Get this bar's x/y values, then augment for the tooltip
 						var xPosition = parseFloat(d3.select(this).attr("x")) + xScaleNew(d.avg_dep_dly) / 2;
-						var yPosition = parseFloat(d3.select(this).attr("y")) + (yScaleNew.bandwidth() / 2);
+						var yPosition = parseFloat(d3.select(this).attr("y")) + (yScaleNew.bandwidth() / 2) + 600 + textParLength;
 
 						//Update the tooltip position and value
 						d3.select("#tooltip")
 							.style("left", xPosition + "px")
 							.style("top", yPosition + "px")
-							.select("#depDelay")
-							.text(d.avg_dep_dly);
+							.select("#value")
+							.text(Math.round(d.avg_dep_dly * 100) / 100);
 
 						d3.select("#tooltip")
 							.select("#airlineDisp")
@@ -669,11 +727,11 @@
 
 						d3.select("#tooltip")
 							.select("#yearDisp")
-							.text(d.full_date);
+							.text(d.fl_year);
 
 						d3.select("#tooltip")
-							.select("#depTime")
-							.text(d.dep_time);
+							.select("#countDisp")
+							.text(d.count);
 
 						//Show the tooltip
 						d3.select("#tooltip").classed("hidden", false);
