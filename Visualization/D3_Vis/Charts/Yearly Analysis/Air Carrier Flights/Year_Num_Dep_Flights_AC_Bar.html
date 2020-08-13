@@ -91,6 +91,10 @@
 		</p>
 
 		<div id="tooltip" class="hidden">
+			<p><strong>Air Carrier: </strong></p>
+			<p><span id="value_ac">100</span></p>
+			<p><strong>Year: </strong></p>
+			<p><span id="value_year">100</span></p>
 			<p><strong>Number of Departed Flights: </strong></p>
 			<p><span id="value">100</span></p>
 		</div>
@@ -225,12 +229,20 @@
 							var xPosition = parseFloat(d3.select(this).attr("x")) + xScale.bandwidth() / 2;
 							var yPosition = (parseFloat(d3.select(this).attr("y")) / 2 + h / 2) + textParLength;
 
-							//Update the tooltip position and value
+							//Update the tooltip position and values
 							d3.select("#tooltip")
 								.style("left", xPosition + "px")
 								.style("top", yPosition + "px")
 								.select("#value")
 								.text(Math.round(d.num_dep_flights_year * 100) / 100);
+
+							d3.select("#tooltip")
+								.select("#value_ac")
+								.text(d.carrier_name);
+
+							d3.select("#tooltip")
+								.select("#value_year")
+								.text(d.fl_year);
 
 							//Show the tooltip
 							d3.select("#tooltip").classed("hidden", false);
