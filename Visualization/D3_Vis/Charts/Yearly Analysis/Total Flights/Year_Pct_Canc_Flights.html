@@ -17,7 +17,7 @@
 	</head>
 	<body>
 		<p style="width: 1200px;">
-				<b>Description:</b> <br>This chart displays a time series of the number of cancelled domestic flights for every year from 1988 to 2019. The number of cancelled flights for each year is shown on the y-axis.
+				<b>Description:</b> <br>This chart displays a time series of the percentage of cancelled domestic flights (in relation to scheduled flights) for every year from 1988 to 2019. The percent number of cancelled flights for each year is shown on the y-axis.
 			<br><br>
 				<b>Features:</b> <br>Zoom in on the time scale using mouse scroller or touchpad. Drag the line along the time scale. Refresh page to obtain the original scale.
 			<br><br>
@@ -84,7 +84,7 @@
 
 				//Convert input data to appropriate data types
 				dataset.forEach(function(d){
-					d.count = +d.num_canc_flights_year;
+					d.count = +d.pct_canc_flights_year* 100;
 					d.fl_date = new Date(String(d.fl_year));
 				});
 

@@ -44,9 +44,9 @@
 	</head>
 	<body>
 		<p style="width: 1200px;">
-		<b>Description:</b> <br>This chart displays a bar graph of total distinct aircraft flown by the selected air carrier by year, according to the tail number data.
+		<b>Description:</b> <br>This chart displays a bar graph of total distinct aircraft flown by the selected air carrier by year, according to the tail number data. This data is only available for the years 1995-2000 and 2003-2019.
 		<br><br>
-		<b>Guide:</b> <br>Select an air carrier from the drop down list. The list contains every air carrier that has a recorded domestic flight between the years 1987 and 2019. Click the "Get Chart" button to update the graph.
+		<b>Guide:</b> <br>Select an air carrier from the drop down list. The list contains every air carrier that has a recorded domestic flight between the years 1988 and 2019. Click the "Get Chart" button to update the graph.
 		<br><br>
 		<b>Features:</b> <br>Hover over any bar in the chart to obtain more details about that observation.
 		<br><br>
@@ -91,7 +91,11 @@
 		</p>
 
 		<div id="tooltip" class="hidden">
-			<p><strong>Number of Aircraft Used</strong></p>
+			<p><strong>Air Carrier: </strong></p>
+			<p><span id="value_ac">100</span></p>
+			<p><strong>Year: </strong></p>
+			<p><span id="value_year">100</span></p>
+			<p><strong>Number of Aircraft Used: </strong></p>
 			<p><span id="value">100</span></p>
 		</div>
 
@@ -232,6 +236,14 @@
 								.style("top", yPosition + "px")
 								.select("#value")
 								.text(d.count);
+
+							d3.select("#tooltip")
+								.select("#value_ac")
+								.text(d.carrier_name);
+
+							d3.select("#tooltip")
+								.select("#value_year")
+								.text(d.fl_year);
 
 							//Show the tooltip
 							d3.select("#tooltip").classed("hidden", false);

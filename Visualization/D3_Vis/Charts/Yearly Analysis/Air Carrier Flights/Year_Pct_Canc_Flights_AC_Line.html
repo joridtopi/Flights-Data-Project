@@ -24,7 +24,7 @@
 	<body>
 
 		<p style="width: 1400px;">
-			<b>Description:</b> <br>This chart displays a time series line graph of the number of aircraft used each year by a selected air carrier. The chart supports up to 10 different lines for comparing the number of aircraft of multiple air carriers. This data is only available for the years 1995-2000 and 2003-2019.
+			<b>Description:</b> <br>This chart displays a time series line graph of the percentage of cancelled flights for each year by a selected air carrier. The chart supports up to 10 different lines for comparing this statistic with multiple air carriers.
 			<br><br>
 			<b>Guide:</b> <br>Select an air carrier from the drop down lists. The list contains every air carrier that has a recorded domestic flight between the years 1988 and 2019. Click the "Get Chart" button to update the graph.
 			<br><br>
@@ -505,7 +505,7 @@
 
 				//Convert input data to appropriate data types
 				dataset.forEach(function(d){
-					d.count = +d.num_ac_used_year;
+					d.count = +d.pct_canc_flights_year * 100;
 					d.fl_date = new Date(String(d.fl_year));
 				});
 
