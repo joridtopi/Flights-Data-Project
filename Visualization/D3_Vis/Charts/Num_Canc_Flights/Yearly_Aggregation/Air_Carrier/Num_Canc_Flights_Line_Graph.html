@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Number of Aircraft Per Year</title>
+		<script type="text/javascript" src="../../../../D3 Lib/d3.js"></script>
+		<style type="text/css">
+			p {
+				font-family: Helvetica, sans-serif;
+				font-size: 14px;
+			}
+
+			select {
+				font-family: Helvetica, sans-serif;
+				font-size: 14px;
+				font-weight: bold;
+			}
+
+			input[type=checkbox] {
+				margin-left: 5px;
+			}
+		</style>
+	</head>
+	<body>
+
+		<p style="width: 1400px;">
+			<b>Description:</b> <br>This chart displays a time series line graph of the number of cancelled flights for each year by a selected air carrier. The chart supports up to 10 different lines for comparing this statistic with multiple air carriers.
+			<br><br>
+			<b>Guide:</b> <br>Select an air carrier from the drop down lists. The list contains every air carrier that has a recorded domestic flight between the years 1988 and 2019. Click the "Get Chart" button to update the graph.
+			<br><br>
+			<b>Features:</b> <br>Zoom in and out of the time scale for a more detailed view of the yearly aircraft count on a particular year. Drag the line left and right along the time scale.
+			<br><br>
+			<b>User Inputs:</b>
+			<br>Line 0: <select id="input0" style="color:seagreen" style="font-weight:bold">
+				<option value="Empty">Empty</option>
+				<option value="AirTran Airways">AirTran Airways</option>
+				<option value="Alaska Airlines">Alaska Airlines</option>
+				<option value="Allegiant Air">Allegiant Air</option>
+				<option value="Aloha Air Cargo">Aloha Air Cargo</option>
+				<option value="America West Airlines">America West Airlines</option>
+				<option value="American Airlines">American Airlines</option>
+				<option value="ATA Airlines">ATA Airlines</option>
+				<option value="Continental Airlines">Continental Airlines</option>
+				<option value="Delta Airlines">Delta Airlines</option>
+				<option value="Eastern Airlines">Eastern Airlines</option>
+				<option value="Endeavor Air">Endeavor Air</option>
+				<option value="Envoy Air">Envoy Air</option>
+				<option value="ExpressJet Airlines">ExpressJet Airlines</option>
+				<option value="Frontier Airlines">Frontier Airlines</option>
+				<option value="Hawaiian Airlines">Hawaiian Airlines</option>
+				<option value="Independence Air">Independence Air</option>
+				<option value="JetBlue Airways">JetBlue Airways</option>
+				<option value="Mesa Airlines">Mesa Airlines</option>
+				<option value="Midway Airlines">Midway Airlines</option>
+				<option value="Northwest Airlines">Northwest Airlines</option>
+				<option value="Pacific Southwest Airlines">Pacific Southwest Airlines</option>
+				<option value="Pan American Airways">Pan American Airways</option>
+				<option value="Piedmont Aviation">Piedmont Aviation</option>
+				<option value="PSA Airlines">PSA Airlines</option>
+				<option value="Republic Airline">Republic Airline</option>
+				<option value="SkyWest Airlines">SkyWest Airlines</option>
+				<option value="Southwest Airlines">Southwest Airlines</option>
+				<option value="Spirit Airlines">Spirit Airlines</option>
+				<option value="Trans World Airways">Trans World Airways</option>
+				<option value="United Airlines">United Airlines</option>
+				<option value="US Airways">US Airways</option>
+				<option value="Virgin America">Virgin America</option>
+			</select>
+
+			Line 1: <select id="input1" style="color:slategray">
+				<option value="Empty">Empty</option>
+				<option value="AirTran Airways">AirTran Airways</option>
+				<option value="Alaska Airlines">Alaska Airlines</option>
+				<option value="Allegiant Air">Allegiant Air</option>
+				<option value="Aloha Air Cargo">Aloha Air Cargo</option>
+				<option value="America West Airlines">America West Airlines</option>
+				<option value="American Airlines">American Airlines</option>
+				<option value="ATA Airlines">ATA Airlines</option>
+				<option value="Continental Airlines">Continental Airlines</option>
+				<option value="Delta Airlines">Delta Airlines</option>
+				<option value="Eastern Airlines">Eastern Airlines</option>
+				<option value="Endeavor Air">Endeavor Air</option>
+				<option value="Envoy Air">Envoy Air</option>
+				<option value="ExpressJet Airlines">ExpressJet Airlines</option>
+				<option value="Frontier Airlines">Frontier Airlines</option>
+				<option value="Hawaiian Airlines">Hawaiian Airlines</option>
+				<option value="Independence Air">Independence Air</option>
+				<option value="JetBlue Airways">JetBlue Airways</option>
+				<option value="Mesa Airlines">Mesa Airlines</option>
+				<option value="Midway Airlines">Midway Airlines</option>
+				<option value="Northwest Airlines">Northwest Airlines</option>
+				<option value="Pacific Southwest Airlines">Pacific Southwest Airlines</option>
+				<option value="Pan American Airways">Pan American Airways</option>
+				<option value="Piedmont Aviation">Piedmont Aviation</option>
+				<option value="PSA Airlines">PSA Airlines</option>
+				<option value="Republic Airline">Republic Airline</option>
+				<option value="SkyWest Airlines">SkyWest Airlines</option>
+				<option value="Southwest Airlines">Southwest Airlines</option>
+				<option value="Spirit Airlines">Spirit Airlines</option>
+				<option value="Trans World Airways">Trans World Airways</option>
+				<option value="United Airlines">United Airlines</option>
+				<option value="US Airways">US Airways</option>
+				<option value="Virgin America">Virgin America</option>
+			</select>
+
+			Line 2: <select id="input2" style="color:darkred">
+				<option value="Empty">Empty</option>
+				<option value="AirTran Airways">AirTran Airways</option>
+				<option value="Alaska Airlines">Alaska Airlines</option>
+				<option value="Allegiant Air">Allegiant Air</option>
+				<option value="Aloha Air Cargo">Aloha Air Cargo</option>
+				<option value="America West Airlines">America West Airlines</option>
+				<option value="American Airlines">American Airlines</option>
+				<option value="ATA Airlines">ATA Airlines</option>
+				<option value="Continental Airlines">Continental Airlines</option>
+				<option value="Delta Airlines">Delta Airlines</option>
+				<option value="Eastern Airlines">Eastern Airlines</option>
+				<option value="Endeavor Air">Endeavor Air</option>
+				<option value="Envoy Air">Envoy Air</option>
+				<option value="ExpressJet Airlines">ExpressJet Airlines</option>
+				<option value="Frontier Airlines">Frontier Airlines</option>
+				<option value="Hawaiian Airlines">Hawaiian Airlines</option>
+				<option value="Independence Air">Independence Air</option>
+				<option value="JetBlue Airways">JetBlue Airways</option>
+				<option value="Mesa Airlines">Mesa Airlines</option>
+				<option value="Midway Airlines">Midway Airlines</option>
+				<option value="Northwest Airlines">Northwest Airlines</option>
+				<option value="Pacific Southwest Airlines">Pacific Southwest Airlines</option>
+				<option value="Pan American Airways">Pan American Airways</option>
+				<option value="Piedmont Aviation">Piedmont Aviation</option>
+				<option value="PSA Airlines">PSA Airlines</option>
+				<option value="Republic Airline">Republic Airline</option>
+				<option value="SkyWest Airlines">SkyWest Airlines</option>
+				<option value="Southwest Airlines">Southwest Airlines</option>
+				<option value="Spirit Airlines">Spirit Airlines</option>
+				<option value="Trans World Airways">Trans World Airways</option>
+				<option value="United Airlines">United Airlines</option>
+				<option value="US Airways">US Airways</option>
+				<option value="Virgin America">Virgin America</option>
+			</select>
+
+			Line 3: <select id="input3" style="color:yellowgreen">
+				<option value="Empty">Empty</option>
+				<option value="AirTran Airways">AirTran Airways</option>
+				<option value="Alaska Airlines">Alaska Airlines</option>
+				<option value="Allegiant Air">Allegiant Air</option>
+				<option value="Aloha Air Cargo">Aloha Air Cargo</option>
+				<option value="America West Airlines">America West Airlines</option>
+				<option value="American Airlines">American Airlines</option>
+				<option value="ATA Airlines">ATA Airlines</option>
+				<option value="Continental Airlines">Continental Airlines</option>
+				<option value="Delta Airlines">Delta Airlines</option>
+				<option value="Eastern Airlines">Eastern Airlines</option>
+				<option value="Endeavor Air">Endeavor Air</option>
+				<option value="Envoy Air">Envoy Air</option>
+				<option value="ExpressJet Airlines">ExpressJet Airlines</option>
+				<option value="Frontier Airlines">Frontier Airlines</option>
+				<option value="Hawaiian Airlines">Hawaiian Airlines</option>
+				<option value="Independence Air">Independence Air</option>
+				<option value="JetBlue Airways">JetBlue Airways</option>
+				<option value="Mesa Airlines">Mesa Airlines</option>
+				<option value="Midway Airlines">Midway Airlines</option>
+				<option value="Northwest Airlines">Northwest Airlines</option>
+				<option value="Pacific Southwest Airlines">Pacific Southwest Airlines</option>
+				<option value="Pan American Airways">Pan American Airways</option>
+				<option value="Piedmont Aviation">Piedmont Aviation</option>
+				<option value="PSA Airlines">PSA Airlines</option>
+				<option value="Republic Airline">Republic Airline</option>
+				<option value="SkyWest Airlines">SkyWest Airlines</option>
+				<option value="Southwest Airlines">Southwest Airlines</option>
+				<option value="Spirit Airlines">Spirit Airlines</option>
+				<option value="Trans World Airways">Trans World Airways</option>
+				<option value="United Airlines">United Airlines</option>
+				<option value="US Airways">US Airways</option>
+				<option value="Virgin America">Virgin America</option>
+			</select>
+
+			Line 4: <select id="input4" style="color:orchid">
+				<option value="Empty">Empty</option>
+				<option value="AirTran Airways">AirTran Airways</option>
+				<option value="Alaska Airlines">Alaska Airlines</option>
+				<option value="Allegiant Air">Allegiant Air</option>
+				<option value="Aloha Air Cargo">Aloha Air Cargo</option>
+				<option value="America West Airlines">America West Airlines</option>
+				<option value="American Airlines">American Airlines</option>
+				<option value="ATA Airlines">ATA Airlines</option>
+				<option value="Continental Airlines">Continental Airlines</option>
+				<option value="Delta Airlines">Delta Airlines</option>
+				<option value="Eastern Airlines">Eastern Airlines</option>
+				<option value="Endeavor Air">Endeavor Air</option>
+				<option value="Envoy Air">Envoy Air</option>
+				<option value="ExpressJet Airlines">ExpressJet Airlines</option>
+				<option value="Frontier Airlines">Frontier Airlines</option>
+				<option value="Hawaiian Airlines">Hawaiian Airlines</option>
+				<option value="Independence Air">Independence Air</option>
+				<option value="JetBlue Airways">JetBlue Airways</option>
+				<option value="Mesa Airlines">Mesa Airlines</option>
+				<option value="Midway Airlines">Midway Airlines</option>
+				<option value="Northwest Airlines">Northwest Airlines</option>
+				<option value="Pacific Southwest Airlines">Pacific Southwest Airlines</option>
+				<option value="Pan American Airways">Pan American Airways</option>
+				<option value="Piedmont Aviation">Piedmont Aviation</option>
+				<option value="PSA Airlines">PSA Airlines</option>
+				<option value="Republic Airline">Republic Airline</option>
+				<option value="SkyWest Airlines">SkyWest Airlines</option>
+				<option value="Southwest Airlines">Southwest Airlines</option>
+				<option value="Spirit Airlines">Spirit Airlines</option>
+				<option value="Trans World Airways">Trans World Airways</option>
+				<option value="United Airlines">United Airlines</option>
+				<option value="US Airways">US Airways</option>
+				<option value="Virgin America">Virgin America</option>
+			</select>
+
+			<br>Line 5: <select id="input5" style="color:skyblue">
+				<option value="Empty">Empty</option>
+				<option value="AirTran Airways">AirTran Airways</option>
+				<option value="Alaska Airlines">Alaska Airlines</option>
+				<option value="Allegiant Air">Allegiant Air</option>
+				<option value="Aloha Air Cargo">Aloha Air Cargo</option>
+				<option value="America West Airlines">America West Airlines</option>
+				<option value="American Airlines">American Airlines</option>
+				<option value="ATA Airlines">ATA Airlines</option>
+				<option value="Continental Airlines">Continental Airlines</option>
+				<option value="Delta Airlines">Delta Airlines</option>
+				<option value="Eastern Airlines">Eastern Airlines</option>
+				<option value="Endeavor Air">Endeavor Air</option>
+				<option value="Envoy Air">Envoy Air</option>
+				<option value="ExpressJet Airlines">ExpressJet Airlines</option>
+				<option value="Frontier Airlines">Frontier Airlines</option>
+				<option value="Hawaiian Airlines">Hawaiian Airlines</option>
+				<option value="Independence Air">Independence Air</option>
+				<option value="JetBlue Airways">JetBlue Airways</option>
+				<option value="Mesa Airlines">Mesa Airlines</option>
+				<option value="Midway Airlines">Midway Airlines</option>
+				<option value="Northwest Airlines">Northwest Airlines</option>
+				<option value="Pacific Southwest Airlines">Pacific Southwest Airlines</option>
+				<option value="Pan American Airways">Pan American Airways</option>
+				<option value="Piedmont Aviation">Piedmont Aviation</option>
+				<option value="PSA Airlines">PSA Airlines</option>
+				<option value="Republic Airline">Republic Airline</option>
+				<option value="SkyWest Airlines">SkyWest Airlines</option>
+				<option value="Southwest Airlines">Southwest Airlines</option>
+				<option value="Spirit Airlines">Spirit Airlines</option>
+				<option value="Trans World Airways">Trans World Airways</option>
+				<option value="United Airlines">United Airlines</option>
+				<option value="US Airways">US Airways</option>
+				<option value="Virgin America">Virgin America</option>
+			</select>
+
+			Line 6: <select id="input6" style="color:indigo">
+				<option value="Empty">Empty</option>
+				<option value="AirTran Airways">AirTran Airways</option>
+				<option value="Alaska Airlines">Alaska Airlines</option>
+				<option value="Allegiant Air">Allegiant Air</option>
+				<option value="Aloha Air Cargo">Aloha Air Cargo</option>
+				<option value="America West Airlines">America West Airlines</option>
+				<option value="American Airlines">American Airlines</option>
+				<option value="ATA Airlines">ATA Airlines</option>
+				<option value="Continental Airlines">Continental Airlines</option>
+				<option value="Delta Airlines">Delta Airlines</option>
+				<option value="Eastern Airlines">Eastern Airlines</option>
+				<option value="Endeavor Air">Endeavor Air</option>
+				<option value="Envoy Air">Envoy Air</option>
+				<option value="ExpressJet Airlines">ExpressJet Airlines</option>
+				<option value="Frontier Airlines">Frontier Airlines</option>
+				<option value="Hawaiian Airlines">Hawaiian Airlines</option>
+				<option value="Independence Air">Independence Air</option>
+				<option value="JetBlue Airways">JetBlue Airways</option>
+				<option value="Mesa Airlines">Mesa Airlines</option>
+				<option value="Midway Airlines">Midway Airlines</option>
+				<option value="Northwest Airlines">Northwest Airlines</option>
+				<option value="Pacific Southwest Airlines">Pacific Southwest Airlines</option>
+				<option value="Pan American Airways">Pan American Airways</option>
+				<option value="Piedmont Aviation">Piedmont Aviation</option>
+				<option value="PSA Airlines">PSA Airlines</option>
+				<option value="Republic Airline">Republic Airline</option>
+				<option value="SkyWest Airlines">SkyWest Airlines</option>
+				<option value="Southwest Airlines">Southwest Airlines</option>
+				<option value="Spirit Airlines">Spirit Airlines</option>
+				<option value="Trans World Airways">Trans World Airways</option>
+				<option value="United Airlines">United Airlines</option>
+				<option value="US Airways">US Airways</option>
+				<option value="Virgin America">Virgin America</option>
+			</select>
+
+			Line 7: <select id="input7" style="color:gold">
+				<option value="Empty">Empty</option>
+				<option value="AirTran Airways">AirTran Airways</option>
+				<option value="Alaska Airlines">Alaska Airlines</option>
+				<option value="Allegiant Air">Allegiant Air</option>
+				<option value="Aloha Air Cargo">Aloha Air Cargo</option>
+				<option value="America West Airlines">America West Airlines</option>
+				<option value="American Airlines">American Airlines</option>
+				<option value="ATA Airlines">ATA Airlines</option>
+				<option value="Continental Airlines">Continental Airlines</option>
+				<option value="Delta Airlines">Delta Airlines</option>
+				<option value="Eastern Airlines">Eastern Airlines</option>
+				<option value="Endeavor Air">Endeavor Air</option>
+				<option value="Envoy Air">Envoy Air</option>
+				<option value="ExpressJet Airlines">ExpressJet Airlines</option>
+				<option value="Frontier Airlines">Frontier Airlines</option>
+				<option value="Hawaiian Airlines">Hawaiian Airlines</option>
+				<option value="Independence Air">Independence Air</option>
+				<option value="JetBlue Airways">JetBlue Airways</option>
+				<option value="Mesa Airlines">Mesa Airlines</option>
+				<option value="Midway Airlines">Midway Airlines</option>
+				<option value="Northwest Airlines">Northwest Airlines</option>
+				<option value="Pacific Southwest Airlines">Pacific Southwest Airlines</option>
+				<option value="Pan American Airways">Pan American Airways</option>
+				<option value="Piedmont Aviation">Piedmont Aviation</option>
+				<option value="PSA Airlines">PSA Airlines</option>
+				<option value="Republic Airline">Republic Airline</option>
+				<option value="SkyWest Airlines">SkyWest Airlines</option>
+				<option value="Southwest Airlines">Southwest Airlines</option>
+				<option value="Spirit Airlines">Spirit Airlines</option>
+				<option value="Trans World Airways">Trans World Airways</option>
+				<option value="United Airlines">United Airlines</option>
+				<option value="US Airways">US Airways</option>
+				<option value="Virgin America">Virgin America</option>
+			</select>
+
+			Line 8: <select id="input8" style="color:cornflowerblue">
+				<option value="Empty">Empty</option>
+				<option value="AirTran Airways">AirTran Airways</option>
+				<option value="Alaska Airlines">Alaska Airlines</option>
+				<option value="Allegiant Air">Allegiant Air</option>
+				<option value="Aloha Air Cargo">Aloha Air Cargo</option>
+				<option value="America West Airlines">America West Airlines</option>
+				<option value="American Airlines">American Airlines</option>
+				<option value="ATA Airlines">ATA Airlines</option>
+				<option value="Continental Airlines">Continental Airlines</option>
+				<option value="Delta Airlines">Delta Airlines</option>
+				<option value="Eastern Airlines">Eastern Airlines</option>
+				<option value="Endeavor Air">Endeavor Air</option>
+				<option value="Envoy Air">Envoy Air</option>
+				<option value="ExpressJet Airlines">ExpressJet Airlines</option>
+				<option value="Frontier Airlines">Frontier Airlines</option>
+				<option value="Hawaiian Airlines">Hawaiian Airlines</option>
+				<option value="Independence Air">Independence Air</option>
+				<option value="JetBlue Airways">JetBlue Airways</option>
+				<option value="Mesa Airlines">Mesa Airlines</option>
+				<option value="Midway Airlines">Midway Airlines</option>
+				<option value="Northwest Airlines">Northwest Airlines</option>
+				<option value="Pacific Southwest Airlines">Pacific Southwest Airlines</option>
+				<option value="Pan American Airways">Pan American Airways</option>
+				<option value="Piedmont Aviation">Piedmont Aviation</option>
+				<option value="PSA Airlines">PSA Airlines</option>
+				<option value="Republic Airline">Republic Airline</option>
+				<option value="SkyWest Airlines">SkyWest Airlines</option>
+				<option value="Southwest Airlines">Southwest Airlines</option>
+				<option value="Spirit Airlines">Spirit Airlines</option>
+				<option value="Trans World Airways">Trans World Airways</option>
+				<option value="United Airlines">United Airlines</option>
+				<option value="US Airways">US Airways</option>
+				<option value="Virgin America">Virgin America</option>
+			</select>
+
+			Line 9: <select id="input9" style="color:coral">
+				<option value="Empty">Empty</option>
+				<option value="AirTran Airways">AirTran Airways</option>
+				<option value="Alaska Airlines">Alaska Airlines</option>
+				<option value="Allegiant Air">Allegiant Air</option>
+				<option value="Aloha Air Cargo">Aloha Air Cargo</option>
+				<option value="America West Airlines">America West Airlines</option>
+				<option value="American Airlines">American Airlines</option>
+				<option value="ATA Airlines">ATA Airlines</option>
+				<option value="Continental Airlines">Continental Airlines</option>
+				<option value="Delta Airlines">Delta Airlines</option>
+				<option value="Eastern Airlines">Eastern Airlines</option>
+				<option value="Endeavor Air">Endeavor Air</option>
+				<option value="Envoy Air">Envoy Air</option>
+				<option value="ExpressJet Airlines">ExpressJet Airlines</option>
+				<option value="Frontier Airlines">Frontier Airlines</option>
+				<option value="Hawaiian Airlines">Hawaiian Airlines</option>
+				<option value="Independence Air">Independence Air</option>
+				<option value="JetBlue Airways">JetBlue Airways</option>
+				<option value="Mesa Airlines">Mesa Airlines</option>
+				<option value="Midway Airlines">Midway Airlines</option>
+				<option value="Northwest Airlines">Northwest Airlines</option>
+				<option value="Pacific Southwest Airlines">Pacific Southwest Airlines</option>
+				<option value="Pan American Airways">Pan American Airways</option>
+				<option value="Piedmont Aviation">Piedmont Aviation</option>
+				<option value="PSA Airlines">PSA Airlines</option>
+				<option value="Republic Airline">Republic Airline</option>
+				<option value="SkyWest Airlines">SkyWest Airlines</option>
+				<option value="Southwest Airlines">Southwest Airlines</option>
+				<option value="Spirit Airlines">Spirit Airlines</option>
+				<option value="Trans World Airways">Trans World Airways</option>
+				<option value="United Airlines">United Airlines</option>
+				<option value="US Airways">US Airways</option>
+				<option value="Virgin America">Virgin America</option>
+			</select>
+			<br><br>
+			<button>Get Chart</button>
+		</p>
+
+
+		<script type="text/javascript">
+
+			var inputsel = [];
+
+			//Obtain input data
+			const data_input = '../../../../JSON_data/Yearly Analysis/Air Carrier Flights/Total_Flights_Year_Table_Ac.json';
+
+			//Global variable of the dataset
+			var datasetGlobal = [];
+
+			//Width and height of SVG canvas
+			var w = 1200;
+			var h = 600;
+
+			//X and Y padding
+			var x_pad = 60;
+			var y_pad = 40;
+
+			//Declare variables globally for scales
+			var xScale = [];
+			var yScale = [];
+
+			//Declare variables globally for zoom transformed scales
+			var xScaleNew = [];
+			var yScaleNew = [];
+
+			//Declare variables globally for adding axes
+			var xAxisAdd = [];
+			var yAxisAdd = [];
+
+			//Declare variables globally for adding lines
+			var line1Add = [];
+			var line2Add = [];
+			var line3Add = [];
+			var line4Add = [];
+			var line5Add = [];
+			var line6Add = [];
+			var line7Add = [];
+			var line8Add = [];
+			var line9Add = [];
+			var line0Add = [];
+
+
+			//Create zoom behavior
+			var zoom = d3.zoom()
+				.on("zoom", updateChart);
+
+			//Create the SVG element for the canvas
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h)
+						.call(zoom);
+
+			//Create clip for clipping zoom transformed lines
+			var clip = svg.append("clipPath")
+					.attr("id", "clip")
+				.append("rect")
+					.attr("x", x_pad)
+					.attr("y", 0)
+					.attr("width", w)
+					.attr("height", h-y_pad);
+
+			//Create event to listen for user input clicks to update data
+			d3.selectAll('button')
+				.on("click", getData);
+
+			//Update the input data
+			function getData(){
+				d3.json(data_input)
+			.then(function(dataset) {
+
+				//Obtain user inputs
+				//Get airline name from input drop down list
+				airline_name = document.getElementById("input1");
+				var input1 = airline_name.options[airline_name.selectedIndex].value;
+				airline_name = document.getElementById("input2");
+				var input2 = airline_name.options[airline_name.selectedIndex].value;
+				airline_name = document.getElementById("input3");
+				var input3 = airline_name.options[airline_name.selectedIndex].value;
+				airline_name = document.getElementById("input4");
+				var input4 = airline_name.options[airline_name.selectedIndex].value;
+				airline_name = document.getElementById("input5");
+				var input5 = airline_name.options[airline_name.selectedIndex].value;
+				airline_name = document.getElementById("input6");
+				var input6 = airline_name.options[airline_name.selectedIndex].value;
+				airline_name = document.getElementById("input7");
+				var input7 = airline_name.options[airline_name.selectedIndex].value;
+				airline_name = document.getElementById("input8");
+				var input8 = airline_name.options[airline_name.selectedIndex].value;
+				airline_name = document.getElementById("input9");
+				var input9 = airline_name.options[airline_name.selectedIndex].value;
+				airline_name = document.getElementById("input0");
+				var input0 = airline_name.options[airline_name.selectedIndex].value;
+
+				//Assign empty string value if the Empty option is selected
+				if (input1 == "Empty"){var input1 = " ";};
+				if (input2 == "Empty"){var input2 = " ";};
+				if (input3 == "Empty"){var input3 = " ";};
+				if (input4 == "Empty"){var input4 = " ";};
+				if (input5 == "Empty"){var input5 = " ";};
+				if (input6 == "Empty"){var input6 = " ";};
+				if (input7 == "Empty"){var input7 = " ";};
+				if (input8 == "Empty"){var input8 = " ";};
+				if (input9 == "Empty"){var input9 = " ";};
+				if (input0 == "Empty"){var input0 = " ";};
+
+
+				//Convert input data to appropriate data types
+				dataset.forEach(function(d){
+					d.count = +d.num_canc_flights_year;
+					d.fl_date = new Date(String(d.fl_year));
+				});
+
+				//Create dataset filtered on selected inputs
+				datasetGlobal = dataset.filter(d=>d.carrier_name==input1
+																	|d.carrier_name==input2
+																	|d.carrier_name==input3
+																	|d.carrier_name==input4
+																	|d.carrier_name==input5
+																	|d.carrier_name==input6
+																	|d.carrier_name==input7
+																	|d.carrier_name==input8
+																	|d.carrier_name==input9
+																  |d.carrier_name==input0);
+
+				//Create dataset for each path line
+				dataset1 = dataset.filter(d=>d.carrier_name==input1);
+				dataset2 = dataset.filter(d=>d.carrier_name==input2);
+				dataset3 = dataset.filter(d=>d.carrier_name==input3);
+				dataset4 = dataset.filter(d=>d.carrier_name==input4);
+				dataset5 = dataset.filter(d=>d.carrier_name==input5);
+				dataset6 = dataset.filter(d=>d.carrier_name==input6);
+				dataset7 = dataset.filter(d=>d.carrier_name==input7);
+				dataset8 = dataset.filter(d=>d.carrier_name==input8);
+				dataset9 = dataset.filter(d=>d.carrier_name==input9);
+				dataset0 = dataset.filter(d=>d.carrier_name==input0);
+
+				//Create scale functions based on filtered data
+				xScale = d3.scaleTime()
+						   .domain([
+								d3.min(datasetGlobal, function(d) { return d.fl_date; }),
+								d3.max(datasetGlobal, function(d) { return d.fl_date; })
+							])
+						   .range([0, w - x_pad]);
+
+				yScale = d3.scaleLinear()
+							.domain([d3.min(datasetGlobal, function(d) { return d.count; }),
+											 d3.max(datasetGlobal, function(d) { return d.count; })])
+							.range([h - y_pad, 0]);
+
+				//Create axes based on X and Y scales
+				xAxis = d3.axisBottom(xScale);
+				yAxis = d3.axisLeft(yScale);
+
+				//Define line generator
+				line = d3.line()
+							.x(function(d) { return xScale(d.fl_date) + x_pad; })
+							.y(function(d) { return yScale(d.count); });
+
+				//Remove any previous axes for a refresh property
+				d3.selectAll("g.axis").remove();
+
+				//Add the x-axis
+				xAxisAdd = svg.append("g")
+				.attr("class", "axis")
+				.attr("transform","translate(" + x_pad + "," + (h-y_pad) + ")")
+					.call(xAxis);
+
+				//Add the y-axis
+				yAxisAdd = svg.append("g")
+				.attr("class", "axis")
+				.attr("transform","translate(" + x_pad + ",0)")
+				.call(yAxis);
+
+				//Remove any previous lines as a refresh
+				d3.selectAll("path.line").remove();
+
+				//Create a line of filtered data based on each user input
+				line0Add = svg.append("path")
+					.datum(dataset0)
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "line")
+					.attr("stroke", "seagreen")
+					.attr("stroke-width", "2px")
+					.attr("fill", "none")
+					.attr("d", line);
+
+
+				line1Add = svg.append("path")
+					.datum(dataset1)
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "line")
+					.attr("stroke", "slategray")
+					.attr("stroke-width", "2px")
+					.attr("fill", "none")
+					.attr("d", line);
+
+				line2Add = svg.append("path")
+					.datum(dataset2)
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "line")
+					.attr("stroke", "darkred")
+					.attr("stroke-width", "2px")
+					.attr("fill", "none")
+					.attr("d", line);
+
+				line3Add = svg.append("path")
+					.datum(dataset3)
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "line")
+					.attr("stroke", "yellowgreen")
+					.attr("stroke-width", "2px")
+					.attr("fill", "none")
+					.attr("d", line);
+
+				line4Add = svg.append("path")
+					.datum(dataset4)
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "line")
+					.attr("stroke", "orchid")
+					.attr("stroke-width", "2px")
+					.attr("fill", "none")
+					.attr("d", line);
+
+				line5Add = svg.append("path")
+					.datum(dataset5)
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "line")
+					.attr("stroke", "skyblue")
+					.attr("stroke-width", "2px")
+					.attr("fill", "none")
+					.attr("d", line);
+
+				line6Add = svg.append("path")
+					.datum(dataset6)
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "line")
+					.attr("stroke", "indigo")
+					.attr("stroke-width", "2px")
+					.attr("fill", "none")
+					.attr("d", line);
+
+				line7Add = svg.append("path")
+					.datum(dataset7)
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "line")
+					.attr("stroke", "gold")
+					.attr("stroke-width", "2px")
+					.attr("fill", "none")
+					.attr("d", line);
+
+				line8Add = svg.append("path")
+					.datum(dataset8)
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "line")
+					.attr("stroke", "cornflowerblue")
+					.attr("stroke-width", "2px")
+					.attr("fill", "none")
+					.attr("d", line);
+
+				line9Add = svg.append("path")
+					.datum(dataset9)
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "line")
+					.attr("stroke", "coral")
+					.attr("stroke-width", "2px")
+					.attr("fill", "none")
+					.attr("d", line);
+				});
+
+				svg.call(zoom.transform, d3.zoomIdentity);
+			}
+
+
+			//Chart update behavior on zoom
+			function updateChart(){
+
+				//Recover the new scale
+				xScaleNew = d3.event.transform.rescaleX(xScale);
+
+				//Obtain the min and max time values from the new x scale domain
+				var xDomainMin = xScaleNew.domain()[0];
+				var xDomainMax = xScaleNew.domain()[1];
+
+				//Filter the dataset based on new x-scale
+				newDataset = datasetGlobal.filter(d=>d.fl_date>=xDomainMin
+																		&d.fl_date<=xDomainMax);
+
+				//Create new y scale based on filtered data
+				yScaleNew = d3.scaleLinear()
+								.domain([d3.min(newDataset, function(d) { return d.count; }),
+												 d3.max(newDataset, function(d) { return d.count; })])
+								.range([h - y_pad, 0]);
+
+				//Update axes with the new boundaries
+				xAxisAdd.call(d3.axisBottom(xScaleNew));
+				yAxisAdd.call(d3.axisLeft(yScaleNew));
+
+				//Create new line path with updated x-scale and same y-scale
+				newLine = d3.line()
+							.x(function(d) { return xScaleNew(d.fl_date); })
+							.y(function(d) { return yScaleNew(d.count); });
+
+				//Update each line with the new line path
+				line1Add.attr("d", newLine);
+				line2Add.attr("d", newLine);
+				line3Add.attr("d", newLine);
+				line4Add.attr("d", newLine);
+				line5Add.attr("d", newLine);
+				line6Add.attr("d", newLine);
+				line7Add.attr("d", newLine);
+				line8Add.attr("d", newLine);
+				line9Add.attr("d", newLine);
+				line0Add.attr("d", newLine);
+
+			};
+
+
+		</script>
+	</body>
+</html>

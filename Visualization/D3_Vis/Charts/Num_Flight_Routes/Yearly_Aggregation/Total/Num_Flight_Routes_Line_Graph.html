@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Number of Aircraft Per Year</title>
+		<script type="text/javascript" src="../../../../D3 Lib/d3.js"></script>
+		<style type="text/css">
+			p {
+				font-family: Helvetica, sans-serif;
+				font-size: 14px;
+			}
+
+			input[type=checkbox] {
+				margin-left: 5px;
+			}
+		</style>
+	</head>
+	<body>
+		<p style="width: 1200px;">
+				<b>Description:</b> <br>This chart displays a time series of the number of distinct routes flown for domestic flights from the year 1988 to 2019. The number of routes is shown on the y-axis.
+			<br><br>
+				<b>Features:</b> <br>Zoom in on the time scale using mouse scroller or touchpad. Drag the line along the time scale. Refresh page to obtain the original scale.
+			<br><br>
+		</p>
+
+		<script type="text/javascript">
+
+			var testdata = [];
+			var inputsel = [];
+
+//Users/jori/Documents/Data Science/Flights_Data_Project/Visualization/D3_Vis/JSON_data/Yearly Analysis/Total Flights/Total_Flights_Year_Table.json
+			//Path to data input
+			const daily_flight_count_data = '../../../../JSON_data/Yearly Analysis/Total Flights/Total_Flights_Year_Table.json';
+
+			//Global variable of the dataset
+			var datasetGlobal = [];
+
+			//Width and height of SVG canvas
+			var w = 1200;
+			var h = 600;
+
+			//X and Y padding
+			var x_pad = 60;
+			var y_pad = 40;
+
+			//Declare variables globally for scales
+			var xScale = [];
+			var yScale = [];
+
+			//Declare variables globally for zoom transformed scales
+			var xScaleNew = [];
+			var yScaleNew = [];
+
+			//Declare variables globally for adding axes
+			var xAxisAdd = [];
+			var yAxisAdd = [];
+
+			//Declare variables globally for adding lines
+			var line1Add = [];
+
+			//Create zoom behavior
+			var zoom = d3.zoom()
+				.on("zoom", updateChart);
+
+			//Create the SVG element for the canvas
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h)
+						.call(zoom);
+
+			//Create clip for clipping zoom transformed lines
+			var clip = svg.append("clipPath")
+					.attr("id", "clip")
+				.append("rect")
+					.attr("x", x_pad)
+					.attr("y", 0)
+					.attr("width", w)
+					.attr("height", h-y_pad);
+
+			//Obtain chart using input data
+			d3.json(daily_flight_count_data)
+			.then(function(dataset) {
+
+				//Convert input data to appropriate data types
+				dataset.forEach(function(d){
+					d.count = +d.num_flight_routes_year;
+					d.fl_date = new Date(String(d.fl_year));
+				});
+
+				//Assign the post-processed dataset to the global
+				datasetGlobal = dataset;
+
+				//Create scale functions based on post-processed data
+				xScale = d3.scaleTime()
+						   .domain([
+								d3.min(datasetGlobal, function(d) { return d.fl_date; }),
+								d3.max(datasetGlobal, function(d) { return d.fl_date; })
+							])
+						   .range([0, w - x_pad]);
+
+				yScale = d3.scaleLinear()
+							.domain([d3.min(datasetGlobal, function(d) { return d.count; }),
+											 d3.max(datasetGlobal, function(d) { return d.count; })])
+							.range([h - y_pad, 0]);
+
+				//Create axes based on X and Y scale functions
+				xAxis = d3.axisBottom(xScale);
+				yAxis = d3.axisLeft(yScale);
+
+				//Define line generator
+				line = d3.line()
+							.x(function(d) { return xScale(d.fl_date) + x_pad; })
+							.y(function(d) { return yScale(d.count); });
+
+				//Remove any previous axes for refresh
+				d3.selectAll("g.axis").remove();
+
+				//Add the x-axis
+				xAxisAdd = svg.append("g")
+				.attr("class", "axis")
+				.attr("transform","translate(" + x_pad + "," + (h-y_pad) + ")")
+					.call(xAxis);
+
+				//Add the y-axis
+				yAxisAdd = svg.append("g")
+				.attr("class", "axis")
+				.attr("transform","translate(" + x_pad + ",0)")
+				.call(yAxis);
+
+				//Remove any previous lines as a refresh
+				d3.selectAll("path.line").remove();
+
+				//Add the line to the chart
+				line1Add = svg.append("path")
+					.datum(datasetGlobal)
+					.attr("clip-path", "url(#clip)")
+					.attr("class", "line")
+					.attr("stroke", "seagreen")
+					.attr("stroke-width", "2px")
+					.attr("fill", "none")
+					.attr("d", line);
+				});
+
+				//Add zoom behavior to svg
+				svg.call(zoom.transform, d3.zoomIdentity);
+
+
+			//Chart update behavior on zoom
+			function updateChart(){
+
+				//Recover the new scale
+				xScaleNew = d3.event.transform.rescaleX(xScale);
+
+				//Obtain the min and max time values from the new x scale domain
+				var xDomainMin = xScaleNew.domain()[0];
+				var xDomainMax = xScaleNew.domain()[1];
+
+				//Filter the dataset based on new x-scale
+				newDataset = datasetGlobal.filter(d=>d.fl_date>=xDomainMin
+																		&d.fl_date<=xDomainMax);
+
+				//Create new y scale based on filtered data
+				yScaleNew = d3.scaleLinear()
+								.domain([d3.min(newDataset, function(d) { return d.count; }),
+												 d3.max(newDataset, function(d) { return d.count; })])
+								.range([h - y_pad, 0]);
+
+				//Update axes with the new boundaries
+				xAxisAdd.call(d3.axisBottom(xScaleNew));
+				yAxisAdd.call(d3.axisLeft(yScaleNew));
+
+				//Create new line path with updated x-scale and same y-scale
+				newLine = d3.line()
+							.x(function(d) { return xScaleNew(d.fl_date); })
+							.y(function(d) { return yScaleNew(d.count); });
+
+				//Update line with the new line path
+				line1Add.attr("d", newLine);
+			};
+
+
+		</script>
+	</body>
+</html>
